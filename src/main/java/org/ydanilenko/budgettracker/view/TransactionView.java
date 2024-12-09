@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TransactionView {
     private final TableView<Transaction> table;
@@ -25,6 +26,9 @@ public class TransactionView {
     private final TextField commentField;
     private final Button addButton;
     private final PieChart pieChart; // PieChart for category-wise visualization
+    private final DatePicker startDatePicker; // Start date for filter
+    private final DatePicker endDatePicker; // End date for filter
+    private final Button filterButton; // Button to apply date range filter
 
     public TransactionView() {
         this.table = new TableView<>();
@@ -35,6 +39,9 @@ public class TransactionView {
         this.commentField = new TextField();
         this.addButton = new Button("Add Transaction");
         this.pieChart = new PieChart(); // Initialize the PieChart
+        this.startDatePicker = new DatePicker(); // Initialize start date picker
+        this.endDatePicker = new DatePicker(); // Initialize end date picker
+        this.filterButton = new Button("Filter"); // Initialize filter button
 
         setupTable();
         setupPaymentTypeOptions();
@@ -104,7 +111,9 @@ public class TransactionView {
         // Populate the PieChart with category data
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
         for (Map.Entry<String, Double> entry : categoryTotals.entrySet()) {
-            pieChartData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+            if (entry.getValue() > 0) { // Include only non-zero totals
+                pieChartData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+            }
         }
 
         pieChart.setData(pieChartData);
@@ -115,6 +124,24 @@ public class TransactionView {
         ObservableList<Transaction> data = FXCollections.observableArrayList(transactions);
         table.setItems(data);
         updatePieChart(transactions); // Update PieChart when transactions are displayed
+    }
+
+    // Apply date range filter and update PieChart
+    public void filterByDateRange(List<Transaction> allTransactions) {
+        LocalDate startDate = startDatePicker.getValue();
+        LocalDate endDate = endDatePicker.getValue();
+
+        // Filter transactions by date range
+        List<Transaction> filteredTransactions = allTransactions.stream()
+                .filter(t -> {
+                    LocalDate transactionDate = LocalDate.parse(t.getDate());
+                    return (startDate == null || !transactionDate.isBefore(startDate)) &&
+                            (endDate == null || !transactionDate.isAfter(endDate));
+                })
+                .collect(Collectors.toList());
+
+        // Update the table and PieChart with filtered data
+        displayTransactions(filteredTransactions);
     }
 
     // Create the form for adding new transactions
@@ -134,7 +161,7 @@ public class TransactionView {
         form.add(categoryField, 1, 2);
 
         form.add(new Label("Payment Type:"), 0, 3);
-        form.add(paymentTypeField, 1, 3); // Use ComboBox for Payment Type
+        form.add(paymentTypeField, 1, 3);
 
         form.add(new Label("Comment:"), 0, 4);
         form.add(commentField, 1, 4);
@@ -144,6 +171,29 @@ public class TransactionView {
 
         return form;
     }
+
+    // Create the date range filter layout
+    private VBox createDateRangeFilter() {
+        VBox dateFilterBox = new VBox(10); // Vertical spacing of 10
+        dateFilterBox.setPadding(new Insets(10));
+
+        // Create the Filter button
+        Button filterButton = this.filterButton;
+
+        // Start Date and End Date controls
+        HBox datePickers = new HBox(10); // Horizontal spacing of 10
+        datePickers.getChildren().addAll(
+                new Label("Start Date:"), startDatePicker,
+                new Label("End Date:"), endDatePicker
+        );
+
+        // Add the Filter button first, then the DatePickers
+        dateFilterBox.getChildren().addAll(filterButton, datePickers);
+
+        return dateFilterBox;
+    }
+
+
 
     // Show the main view
     public void show(Stage stage) {
@@ -156,15 +206,16 @@ public class TransactionView {
         layout.setTop(title);
         BorderPane.setMargin(title, new Insets(10));
 
-        // TableView and PieChart
-        VBox centerBox = new VBox(10, table, pieChart); // Add PieChart below TableView
-        layout.setCenter(centerBox);
+        // Center: TableView and PieChart with date range filter
+        HBox centerBox = new HBox(20, pieChart, createDateRangeFilter());
+        VBox mainCenter = new VBox(10, table, centerBox);
+        layout.setCenter(mainCenter);
 
         // Form at the bottom
         layout.setBottom(createForm());
 
         // Scene and stage setup
-        Scene scene = new Scene(layout, 900, 700); // Adjust dimensions for the PieChart
+        Scene scene = new Scene(layout, 1000, 700); // Adjusted width for PieChart and date filter
         stage.setScene(scene);
         stage.setTitle("Budget Tracker");
         stage.show();
@@ -212,5 +263,16 @@ public class TransactionView {
     public Button getAddButton() {
         return addButton;
     }
-}
 
+    public DatePicker getStartDatePicker() {
+        return startDatePicker;
+    }
+
+    public DatePicker getEndDatePicker() {
+        return endDatePicker;
+    }
+
+    public Button getFilterButton() {
+        return filterButton;
+    }
+}

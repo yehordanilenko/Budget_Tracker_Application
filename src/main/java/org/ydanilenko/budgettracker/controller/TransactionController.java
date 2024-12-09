@@ -5,12 +5,16 @@ import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
 import org.ydanilenko.budgettracker.view.TransactionView;
 
-import java.util.List;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TransactionController {
     private final TransactionDAO transactionDAO;
     private final TransactionView transactionView;
+    private List<Transaction> allTransactions; // Store all transactions in memory
 
     public TransactionController(TransactionDAO transactionDAO, TransactionView transactionView) {
         this.transactionDAO = transactionDAO;
@@ -21,6 +25,7 @@ public class TransactionController {
 
         // Set up event handling
         transactionView.getAddButton().setOnAction(e -> addTransaction());
+        transactionView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange()); // Add filter handling
     }
 
     public void addTransaction() {
@@ -65,8 +70,53 @@ public class TransactionController {
     }
 
     public void updateTransactionList() {
-        transactionView.displayTransactions(transactionDAO.getAllTransactions());
+        allTransactions = transactionDAO.getAllTransactions(); // Fetch all transactions
+        transactionView.displayTransactions(allTransactions); // Display all transactions
     }
+
+    public void filterTransactionsByDateRange() {
+        if (allTransactions == null || allTransactions.isEmpty()) {
+            transactionView.showError("No transactions to filter.");
+            return;
+        }
+
+        // Get date range from the view
+        LocalDate startDate = transactionView.getStartDatePicker().getValue();
+        LocalDate endDate = transactionView.getEndDatePicker().getValue();
+
+        // Validate end date
+        if (endDate != null && endDate.isAfter(LocalDate.now())) {
+            transactionView.showError("End date cannot be later than today.");
+            return;
+        }
+
+        // Validate start date vs end date
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            transactionView.showError("Start date cannot be after end date.");
+            return;
+        }
+
+        // Define a formatter to parse the dates
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d");
+
+        // Filter transactions by date range
+        List<Transaction> filteredTransactions = allTransactions.stream()
+                .filter(t -> {
+                    try {
+                        LocalDate transactionDate = LocalDate.parse(t.getDate(), formatter);
+                        return (startDate == null || !transactionDate.isBefore(startDate)) &&
+                                (endDate == null || !transactionDate.isAfter(endDate));
+                    } catch (DateTimeParseException e) {
+                        System.err.println("Invalid date format in transaction: " + t.getDate());
+                        return false; // Exclude transactions with invalid dates
+                    }
+                })
+                .collect(Collectors.toList());
+
+        // Update the view with the filtered transactions
+        transactionView.displayTransactions(filteredTransactions);
+    }
+
 
     public void initialize() {
         updateTransactionList();
