@@ -16,7 +16,7 @@ public class TransactionDAO {
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setDouble(1, transaction.getAmount());
             pstmt.setString(2, transaction.getDate());
-            pstmt.setInt(3, transaction.getCategoryId()); // Use category ID
+            pstmt.setInt(3, transaction.getCategoryId());
             pstmt.setString(4, transaction.getPaymentType());
             pstmt.setString(5, transaction.getComment());
             pstmt.executeUpdate();
@@ -40,7 +40,7 @@ public class TransactionDAO {
                         rs.getInt("id"),
                         rs.getDouble("amount"),
                         rs.getString("date"),
-                        rs.getString("categoryName"), // Fetch category name
+                        rs.getString("categoryName"),
                         rs.getString("paymentType"),
                         rs.getString("comment")
                 ));

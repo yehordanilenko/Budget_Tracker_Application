@@ -1,34 +1,31 @@
 package org.ydanilenko.budgettracker.model;
 
 public class Transaction {
-    private int id; // Auto-incremented by the database
+    private int id;
     private double amount;
     private String date;
-    private int categoryId; // Store the category ID for database operations
-    private String categoryName; // Use for displaying the category name in the UI
+    private int categoryId;
+    private String categoryName;
     private String paymentType;
     private String comment;
 
-    // Constructor for retrieving transactions (includes id and categoryName)
     public Transaction(int id, double amount, String date, String categoryName, String paymentType, String comment) {
         this.id = id;
         this.amount = amount;
         this.date = date;
-        this.categoryName = categoryName; // Name from the database join
+        this.categoryName = categoryName;
         this.paymentType = paymentType;
         this.comment = comment;
     }
 
-    // Constructor for adding new transactions (uses categoryId)
     public Transaction(double amount, String date, int categoryId, String paymentType, String comment) {
         this.amount = amount;
         this.date = date;
-        this.categoryId = categoryId; // Use ID for database insertion
+        this.categoryId = categoryId;
         this.paymentType = paymentType;
         this.comment = comment;
     }
 
-    // Getters and setters
     public int getId() {
         return id;
     }

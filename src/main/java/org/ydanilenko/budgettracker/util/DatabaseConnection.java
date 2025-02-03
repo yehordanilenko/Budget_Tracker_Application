@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-    // Directly set the database URL to use a relative path
     private static final String DATABASE_URL = "jdbc:sqlite:budgettracker.db";
 
     public static Connection getConnection() {

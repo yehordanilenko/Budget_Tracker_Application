@@ -11,10 +11,8 @@ import org.ydanilenko.budgettracker.view.TransactionView;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
-        // Setup database connection
         var connection = DatabaseConnection.getConnection();
 
-        // Initialize DAO, View, and Controller
         TransactionDAO transactionDAO = new TransactionDAO(connection);
         TransactionView transactionView = new TransactionView();
         TransactionController transactionController = new TransactionController(transactionDAO, transactionView);
@@ -22,10 +20,8 @@ public class Main extends Application {
         Image icon = new Image(getClass().getResourceAsStream("/images/app_icon.png"));
         primaryStage.getIcons().add(icon);
 
-        // Initialize the controller to load and display existing transactions
         transactionController.initialize();
 
-        // Show the GUI
         transactionView.show(primaryStage);
     }
 

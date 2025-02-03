@@ -14,18 +14,16 @@ import java.util.stream.Collectors;
 public class TransactionController {
     private final TransactionDAO transactionDAO;
     private final TransactionView transactionView;
-    private List<Transaction> allTransactions; // Store all transactions in memory
+    private List<Transaction> allTransactions;
 
     public TransactionController(TransactionDAO transactionDAO, TransactionView transactionView) {
         this.transactionDAO = transactionDAO;
         this.transactionView = transactionView;
 
-        // Populate categories in ComboBox
         transactionView.getCategoryField().setItems(FXCollections.observableArrayList(transactionDAO.getAllCategories()));
 
-        // Set up event handling
         transactionView.getAddButton().setOnAction(e -> addTransaction());
-        transactionView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange()); // Add filter handling
+        transactionView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange());
     }
 
     public void addTransaction() {
@@ -39,8 +37,8 @@ public class TransactionController {
 
         try {
             double amount = Double.parseDouble(transactionView.getAmountField().getText());
-            LocalDate date = transactionView.getDateField().getValue(); // Get selected date
-            if (date.isAfter(LocalDate.now())) { // Check if the date is in the future
+            LocalDate date = transactionView.getDateField().getValue();
+            if (date.isAfter(LocalDate.now())) {
                 transactionView.showError("The date cannot be later than today.");
                 return;
             }
@@ -70,8 +68,8 @@ public class TransactionController {
     }
 
     public void updateTransactionList() {
-        allTransactions = transactionDAO.getAllTransactions(); // Fetch all transactions
-        transactionView.displayTransactions(allTransactions); // Display all transactions
+        allTransactions = transactionDAO.getAllTransactions();
+        transactionView.displayTransactions(allTransactions);
     }
 
     public void filterTransactionsByDateRange() {
@@ -80,26 +78,21 @@ public class TransactionController {
             return;
         }
 
-        // Get date range from the view
         LocalDate startDate = transactionView.getStartDatePicker().getValue();
         LocalDate endDate = transactionView.getEndDatePicker().getValue();
 
-        // Validate end date
         if (endDate != null && endDate.isAfter(LocalDate.now())) {
             transactionView.showError("End date cannot be later than today.");
             return;
         }
 
-        // Validate start date vs end date
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             transactionView.showError("Start date cannot be after end date.");
             return;
         }
 
-        // Define a formatter to parse the dates
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d");
 
-        // Filter transactions by date range
         List<Transaction> filteredTransactions = allTransactions.stream()
                 .filter(t -> {
                     try {
@@ -108,15 +101,13 @@ public class TransactionController {
                                 (endDate == null || !transactionDate.isAfter(endDate));
                     } catch (DateTimeParseException e) {
                         System.err.println("Invalid date format in transaction: " + t.getDate());
-                        return false; // Exclude transactions with invalid dates
+                        return false;
                     }
                 })
                 .collect(Collectors.toList());
 
-        // Update the view with the filtered transactions
         transactionView.displayTransactions(filteredTransactions);
     }
-
 
     public void initialize() {
         updateTransactionList();
