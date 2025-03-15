@@ -7,6 +7,7 @@ public class Transaction {
     private int categoryId;
     private String categoryName;
     private String paymentType;
+    private int paymentTypeId;
     private String comment;
 
     public Transaction(int id, double amount, String date, String categoryName, String paymentType, String comment) {
@@ -18,11 +19,11 @@ public class Transaction {
         this.comment = comment;
     }
 
-    public Transaction(double amount, String date, int categoryId, String paymentType, String comment) {
+    public Transaction(double amount, String date, int categoryId, int paymentTypeId, String comment) {
         this.amount = amount;
         this.date = date;
         this.categoryId = categoryId;
-        this.paymentType = paymentType;
+        this.paymentTypeId = paymentTypeId;
         this.comment = comment;
     }
 
@@ -64,6 +65,14 @@ public class Transaction {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public int getPaymentTypeId() {
+        return paymentTypeId;
+    }
+
+    public void setPaymentTypeId(int paymentType) {
+        this.paymentTypeId = paymentTypeId;
     }
 
     public String getPaymentType() {

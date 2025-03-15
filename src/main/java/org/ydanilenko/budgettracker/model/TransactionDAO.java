@@ -17,7 +17,7 @@ public class TransactionDAO {
             pstmt.setDouble(1, transaction.getAmount());
             pstmt.setString(2, transaction.getDate());
             pstmt.setInt(3, transaction.getCategoryId());
-            pstmt.setString(4, transaction.getPaymentType());
+            pstmt.setInt(4, transaction.getPaymentTypeId());
             pstmt.setString(5, transaction.getComment());
             pstmt.executeUpdate();
             return true;
@@ -29,21 +29,24 @@ public class TransactionDAO {
 
     public List<Transaction> getAllTransactions() {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT t.id, t.amount, t.date, c.name AS categoryName, t.paymentType, t.comment " +
+        String sql = "SELECT t.id, t.amount, t.date, c.name AS categoryName, p.name AS paymentType, t.comment " +
                 "FROM Transactions t " +
-                "JOIN Categories c ON t.category = c.id";
+                "JOIN Categories c ON t.category = c.id " +
+                "JOIN PaymentTypes p ON t.paymentType = p.id";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                transactions.add(new Transaction(
-                        rs.getInt("id"),
-                        rs.getDouble("amount"),
-                        rs.getString("date"),
-                        rs.getString("categoryName"),
-                        rs.getString("paymentType"),
-                        rs.getString("comment")
-                ));
+                int id = rs.getInt("id");
+                double amount = rs.getDouble("amount");
+                String date = rs.getString("date");
+                String categoryName = rs.getString("categoryName");
+                String paymentType = rs.getString("paymentType");
+                String comment = rs.getString("comment");
+
+                System.out.println("Transaction: " + id + ", " + amount + ", " + date + ", " + categoryName + ", " + paymentType + ", " + comment);
+
+                transactions.add(new Transaction(id, amount, date, categoryName, paymentType, comment));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -81,4 +84,19 @@ public class TransactionDAO {
         }
         return -1;
     }
+
+    public int getPaymentTypeIdByName(String paymentTypeName) {
+        String sql = "SELECT id FROM PaymentTypes WHERE name = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, paymentTypeName);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
 }

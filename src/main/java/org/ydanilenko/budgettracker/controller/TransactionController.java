@@ -45,10 +45,11 @@ public class TransactionController {
 
             String category = transactionView.getCategoryField().getValue();
             int categoryId = transactionDAO.getCategoryIdByName(category);
-            String paymentType = transactionView.getPaymentTypeField().getValue();
+            String paymentTypeName = transactionView.getPaymentTypeField().getValue();
+            int paymentTypeId = transactionDAO.getPaymentTypeIdByName(paymentTypeName);
             String comment = transactionView.getCommentField().getText();
 
-            Transaction transaction = new Transaction(amount, date.toString(), categoryId, paymentType, comment);
+            Transaction transaction = new Transaction(amount, date.toString(), categoryId, paymentTypeId, comment);
             boolean success = transactionDAO.addTransaction(transaction);
 
             if (success) {
