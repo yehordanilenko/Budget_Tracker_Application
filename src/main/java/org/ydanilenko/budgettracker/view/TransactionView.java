@@ -19,33 +19,23 @@ import java.util.stream.Collectors;
 
 public class TransactionView {
     private final TableView<Transaction> table;
-    private final TextField amountField;
-    private final DatePicker dateField;
-    private final ComboBox<String> categoryField;
-    private final ComboBox<String> paymentTypeField;
-    private final TextField commentField;
-    private final Button addButton;
     private final PieChart pieChart;
     private final DatePicker startDatePicker;
     private final DatePicker endDatePicker;
     private final Button filterButton;
+    private final Button addButton;
+    private Stage stage;
 
-    public TransactionView() {
+    public TransactionView(Stage stage) {
+        this.stage = stage;
         this.table = new TableView<>();
-        this.amountField = new TextField();
-        this.dateField = new DatePicker();
-        this.categoryField = new ComboBox<>();
-        this.paymentTypeField = new ComboBox<>();
-        this.commentField = new TextField();
-        this.addButton = new Button("Add Transaction");
         this.pieChart = new PieChart();
         this.startDatePicker = new DatePicker();
         this.endDatePicker = new DatePicker();
         this.filterButton = new Button("Filter");
+        this.addButton = new Button("Add Transaction");
 
         setupTable();
-        setupPaymentTypeOptions();
-        restrictFutureDates();
         setupPieChart();
     }
 
@@ -67,24 +57,6 @@ public class TransactionView {
 
         table.getColumns().addAll(amountColumn, dateColumn, categoryColumn, paymentTypeColumn, commentColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-    }
-
-    private void setupPaymentTypeOptions() {
-        ObservableList<String> paymentTypes = FXCollections.observableArrayList("Cash", "Card", "Bank Transfer", "Other");
-        paymentTypeField.setItems(paymentTypes);
-    }
-
-    private void restrictFutureDates() {
-        dateField.setDayCellFactory(picker -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate date, boolean empty) {
-                super.updateItem(date, empty);
-                if (date.isAfter(LocalDate.now())) {
-                    setDisable(true);
-                    setStyle("-fx-background-color: #cccccc;");
-                }
-            }
-        });
     }
 
     private void setupPieChart() {
@@ -117,53 +89,9 @@ public class TransactionView {
         updatePieChart(transactions);
     }
 
-    public void filterByDateRange(List<Transaction> allTransactions) {
-        LocalDate startDate = startDatePicker.getValue();
-        LocalDate endDate = endDatePicker.getValue();
-
-        List<Transaction> filteredTransactions = allTransactions.stream()
-                .filter(t -> {
-                    LocalDate transactionDate = LocalDate.parse(t.getDate());
-                    return (startDate == null || !transactionDate.isBefore(startDate)) &&
-                            (endDate == null || !transactionDate.isAfter(endDate));
-                })
-                .collect(Collectors.toList());
-
-        displayTransactions(filteredTransactions);
-    }
-
-    private GridPane createForm() {
-        GridPane form = new GridPane();
-        form.setPadding(new Insets(10));
-        form.setHgap(10);
-        form.setVgap(10);
-
-        form.add(new Label("Amount:"), 0, 0);
-        form.add(amountField, 1, 0);
-
-        form.add(new Label("Date:"), 0, 1);
-        form.add(dateField, 1, 1);
-
-        form.add(new Label("Category:"), 0, 2);
-        form.add(categoryField, 1, 2);
-
-        form.add(new Label("Payment Type:"), 0, 3);
-        form.add(paymentTypeField, 1, 3);
-
-        form.add(new Label("Comment:"), 0, 4);
-        form.add(commentField, 1, 4);
-
-        HBox buttonBox = new HBox(10, addButton);
-        form.add(buttonBox, 1, 5);
-
-        return form;
-    }
-
-    private VBox createDateRangeFilter() {
+    public VBox createDateRangeFilter() {
         VBox dateFilterBox = new VBox(10);
         dateFilterBox.setPadding(new Insets(10));
-
-        Button filterButton = this.filterButton;
 
         HBox datePickers = new HBox(10);
         datePickers.getChildren().addAll(
@@ -177,6 +105,8 @@ public class TransactionView {
     }
 
     public void show(Stage stage) {
+        this.stage = stage;
+
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(10));
 
@@ -189,48 +119,13 @@ public class TransactionView {
         VBox mainCenter = new VBox(10, table, centerBox);
         layout.setCenter(mainCenter);
 
-        layout.setBottom(createForm());
+        HBox bottomControls = new HBox(10, addButton);
+        layout.setBottom(bottomControls);
 
         Scene scene = new Scene(layout, 1000, 700);
         stage.setScene(scene);
         stage.setTitle("Budget Tracker");
         stage.show();
-    }
-
-    public void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Validation Error");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    public void showSuccess(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Success");
-        alert.setHeaderText("Action Completed");
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    public TextField getAmountField() {
-        return amountField;
-    }
-
-    public DatePicker getDateField() {
-        return dateField;
-    }
-
-    public ComboBox<String> getCategoryField() {
-        return categoryField;
-    }
-
-    public ComboBox<String> getPaymentTypeField() {
-        return paymentTypeField;
-    }
-
-    public TextField getCommentField() {
-        return commentField;
     }
 
     public Button getAddButton() {
@@ -247,5 +142,9 @@ public class TransactionView {
 
     public Button getFilterButton() {
         return filterButton;
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 }

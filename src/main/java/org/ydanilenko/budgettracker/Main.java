@@ -14,7 +14,7 @@ public class Main extends Application {
         var connection = DatabaseConnection.getConnection();
 
         TransactionDAO transactionDAO = new TransactionDAO(connection);
-        TransactionView transactionView = new TransactionView();
+        TransactionView transactionView = new TransactionView(primaryStage);
         TransactionController transactionController = new TransactionController(transactionDAO, transactionView);
 
         Image icon = new Image(getClass().getResourceAsStream("/images/app_icon.png"));
