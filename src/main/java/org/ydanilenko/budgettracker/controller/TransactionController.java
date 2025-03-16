@@ -6,7 +6,11 @@ import org.ydanilenko.budgettracker.model.TransactionDAO;
 import org.ydanilenko.budgettracker.view.TransactionForm;
 import org.ydanilenko.budgettracker.view.TransactionView;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TransactionController {
     private final TransactionDAO transactionDAO;
@@ -31,7 +35,40 @@ public class TransactionController {
     }
 
     public void filterTransactionsByDateRange() {
-        // Filtering logic remains unchanged
+        if (allTransactions == null || allTransactions.isEmpty()) {
+            transactionView.showError("No transactions to filter.");
+            return;
+        }
+
+        LocalDate startDate = transactionView.getStartDatePicker().getValue();
+        LocalDate endDate = transactionView.getEndDatePicker().getValue();
+
+        if (endDate != null && endDate.isAfter(LocalDate.now())) {
+            transactionView.showError("End date cannot be later than today.");
+            return;
+        }
+
+        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+            transactionView.showError("Start date cannot be after end date.");
+            return;
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d");
+
+        List<Transaction> filteredTransactions = allTransactions.stream()
+                .filter(t -> {
+                    try {
+                        LocalDate transactionDate = LocalDate.parse(t.getDate(), formatter);
+                        return (startDate == null || !transactionDate.isBefore(startDate)) &&
+                                (endDate == null || !transactionDate.isAfter(endDate));
+                    } catch (DateTimeParseException e) {
+                        System.err.println("Invalid date format in transaction: " + t.getDate());
+                        return false;
+                    }
+                })
+                .collect(Collectors.toList());
+
+        transactionView.displayTransactions(filteredTransactions);
     }
 
     public void initialize() {

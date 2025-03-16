@@ -61,7 +61,7 @@ public class TransactionView {
 
     private void setupPieChart() {
         pieChart.setTitle("Spending by Category");
-        pieChart.setLegendVisible(true);
+        pieChart.setLegendVisible(false);
     }
 
     public void updatePieChart(List<Transaction> transactions) {
@@ -127,7 +127,21 @@ public class TransactionView {
         stage.setTitle("Budget Tracker");
         stage.show();
     }
+    public void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Validation Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
+    public void showSuccess(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText("Action Completed");
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
     public Button getAddButton() {
         return addButton;
     }
