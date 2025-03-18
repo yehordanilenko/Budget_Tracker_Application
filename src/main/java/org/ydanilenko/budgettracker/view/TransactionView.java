@@ -8,6 +8,10 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
+import javafx.beans.binding.Bindings;
+
 import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
 
@@ -65,10 +69,11 @@ public class TransactionView {
     }
 
     public void updatePieChart(List<Transaction> transactions) {
-        Map<String, Double> categoryTotals = new HashMap<>();
+        double totalAmount = transactions.stream().mapToDouble(Transaction::getAmount).sum();
 
+        Map<String, Double> categoryTotals = new HashMap<>();
         for (Transaction transaction : transactions) {
-            String category = transaction.getCategoryName();
+            String category = transaction.getCategoryName().trim();
             double amount = transaction.getAmount();
             categoryTotals.put(category, categoryTotals.getOrDefault(category, 0.0) + amount);
         }
@@ -76,12 +81,27 @@ public class TransactionView {
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
         for (Map.Entry<String, Double> entry : categoryTotals.entrySet()) {
             if (entry.getValue() > 0) {
-                pieChartData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
+                PieChart.Data slice = new PieChart.Data(entry.getKey(), entry.getValue());
+                double percentage = (entry.getValue() / totalAmount) * 100;
+                slice.nameProperty().bind(Bindings.concat(entry.getKey(), " (", String.format("%.2f", percentage), "%)"));
+                pieChartData.add(slice);
             }
         }
 
         pieChart.setData(pieChartData);
+
+        for (PieChart.Data slice : pieChart.getData()) {
+            slice.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                if (newNode != null) {
+                    Tooltip tooltip = new Tooltip(String.format("%.2f%%", (slice.getPieValue() / totalAmount) * 100));
+                    Tooltip.install(newNode, tooltip);
+                    newNode.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> tooltip.show(newNode, e.getScreenX(), e.getScreenY()));
+                    newNode.addEventHandler(MouseEvent.MOUSE_EXITED, e -> tooltip.hide());
+                }
+            });
+        }
     }
+
 
     public void displayTransactions(List<Transaction> transactions) {
         ObservableList<Transaction> data = FXCollections.observableArrayList(transactions);
