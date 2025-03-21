@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class TransactionView {
     private final TableView<Transaction> table;
     private final PieChart pieChart;
+    private final PieChart paymentTypePieChart;
     private final DatePicker startDatePicker;
     private final DatePicker endDatePicker;
     private final Button filterButton;
@@ -34,6 +35,7 @@ public class TransactionView {
         this.stage = stage;
         this.table = new TableView<>();
         this.pieChart = new PieChart();
+        this.paymentTypePieChart = new PieChart();
         this.startDatePicker = new DatePicker();
         this.endDatePicker = new DatePicker();
         this.filterButton = new Button("Filter");
@@ -41,6 +43,7 @@ public class TransactionView {
 
         setupTable();
         setupPieChart();
+        setupPaymentTypePieChart();
     }
 
     private void setupTable() {
@@ -65,7 +68,12 @@ public class TransactionView {
 
     private void setupPieChart() {
         pieChart.setTitle("Spending by Category");
-        pieChart.setLegendVisible(false);
+        pieChart.setLegendVisible(true);
+    }
+
+    private void setupPaymentTypePieChart() {
+        paymentTypePieChart.setTitle("Spending by Payment Type");
+        paymentTypePieChart.setLegendVisible(true);
     }
 
     public void updatePieChart(List<Transaction> transactions) {
@@ -78,30 +86,36 @@ public class TransactionView {
             categoryTotals.put(category, categoryTotals.getOrDefault(category, 0.0) + amount);
         }
 
-        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+        Map<String, Double> paymentTypeTotals = new HashMap<>();
+        for (Transaction transaction : transactions) {
+            String paymentType = transaction.getPaymentType().trim();
+            double amount = transaction.getAmount();
+            paymentTypeTotals.put(paymentType, paymentTypeTotals.getOrDefault(paymentType, 0.0) + amount);
+        }
+
+        ObservableList<PieChart.Data> categoryPieChartData = FXCollections.observableArrayList();
         for (Map.Entry<String, Double> entry : categoryTotals.entrySet()) {
             if (entry.getValue() > 0) {
                 PieChart.Data slice = new PieChart.Data(entry.getKey(), entry.getValue());
                 double percentage = (entry.getValue() / totalAmount) * 100;
                 slice.nameProperty().bind(Bindings.concat(entry.getKey(), " (", String.format("%.2f", percentage), "%)"));
-                pieChartData.add(slice);
+                categoryPieChartData.add(slice);
             }
         }
 
-        pieChart.setData(pieChartData);
-
-        for (PieChart.Data slice : pieChart.getData()) {
-            slice.nodeProperty().addListener((obs, oldNode, newNode) -> {
-                if (newNode != null) {
-                    Tooltip tooltip = new Tooltip(String.format("%.2f%%", (slice.getPieValue() / totalAmount) * 100));
-                    Tooltip.install(newNode, tooltip);
-                    newNode.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> tooltip.show(newNode, e.getScreenX(), e.getScreenY()));
-                    newNode.addEventHandler(MouseEvent.MOUSE_EXITED, e -> tooltip.hide());
-                }
-            });
+        ObservableList<PieChart.Data> paymentTypePieChartData = FXCollections.observableArrayList();
+        for (Map.Entry<String, Double> entry : paymentTypeTotals.entrySet()) {
+            if (entry.getValue() > 0) {
+                PieChart.Data slice = new PieChart.Data(entry.getKey(), entry.getValue());
+                double percentage = (entry.getValue() / totalAmount) * 100;
+                slice.nameProperty().bind(Bindings.concat(entry.getKey(), " (", String.format("%.2f", percentage), "%)"));
+                paymentTypePieChartData.add(slice);
+            }
         }
-    }
 
+        pieChart.setData(categoryPieChartData);
+        paymentTypePieChart.setData(paymentTypePieChartData);
+    }
 
     public void displayTransactions(List<Transaction> transactions) {
         ObservableList<Transaction> data = FXCollections.observableArrayList(transactions);
@@ -135,11 +149,18 @@ public class TransactionView {
         layout.setTop(title);
         BorderPane.setMargin(title, new Insets(10));
 
-        HBox centerBox = new HBox(20, pieChart, createDateRangeFilter());
-        VBox mainCenter = new VBox(10, table, centerBox);
+        HBox pieChartsBox = new HBox(20);
+        pieChartsBox.getChildren().addAll(pieChart, paymentTypePieChart);
+
+        VBox pieAndFilterBox = new VBox(20);
+        pieAndFilterBox.getChildren().addAll(pieChartsBox, createDateRangeFilter());
+
+        HBox bottomControls = new HBox(10);
+        bottomControls.getChildren().addAll(addButton);
+
+        VBox mainCenter = new VBox(10, table, pieAndFilterBox);
         layout.setCenter(mainCenter);
 
-        HBox bottomControls = new HBox(10, addButton);
         layout.setBottom(bottomControls);
 
         Scene scene = new Scene(layout, 1000, 700);
@@ -147,6 +168,7 @@ public class TransactionView {
         stage.setTitle("Budget Tracker");
         stage.show();
     }
+
     public void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Validation Error");
