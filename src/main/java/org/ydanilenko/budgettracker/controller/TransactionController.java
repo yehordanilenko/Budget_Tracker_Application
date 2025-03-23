@@ -31,6 +31,13 @@ public class TransactionController {
             transactionView.getEndDatePicker().setValue(null);
             updateTransactionList();
         });
+
+        transactionView.getSwitchToIncomeButton().setOnAction(e -> {
+            System.out.println("Switch to income page clicked."); // temporary
+
+            // TODO: Replace this with actual IncomePage logic
+        });
+
         transactionView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange());
     }
 

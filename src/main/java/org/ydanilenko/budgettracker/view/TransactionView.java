@@ -31,6 +31,7 @@ public class TransactionView {
     private final Button addButton;
     private Stage stage;
     private final Button resetFilterButton = new Button("Reset Filter");
+    private final Button switchToIncomeButton = new Button("→ Income Page");
 
     public TransactionView(Stage stage) {
         this.stage = stage;
@@ -163,7 +164,17 @@ public class TransactionView {
 
         Label title = new Label("Budget Tracker");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-        layout.setTop(title);
+
+        HBox header = new HBox();
+        header.setPadding(new Insets(10));
+        header.setSpacing(10);
+        header.setHgrow(title, Priority.ALWAYS);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        header.getChildren().addAll(title, spacer, switchToIncomeButton);
+
+        layout.setTop(header);
+        //layout.setTop(title);
         BorderPane.setMargin(title, new Insets(10));
 
         HBox pieChartsBox = new HBox(20);
@@ -203,6 +214,10 @@ public class TransactionView {
     }
     public Button getAddButton() {
         return addButton;
+    }
+
+    public Button getSwitchToIncomeButton() {
+        return switchToIncomeButton;
     }
 
     public DatePicker getStartDatePicker() {
