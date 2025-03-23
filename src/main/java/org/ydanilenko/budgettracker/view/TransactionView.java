@@ -30,6 +30,7 @@ public class TransactionView {
     private final Button filterButton;
     private final Button addButton;
     private Stage stage;
+    private final Button resetFilterButton = new Button("Reset Filter");
 
     public TransactionView(Stage stage) {
         this.stage = stage;
@@ -44,6 +45,9 @@ public class TransactionView {
         setupTable();
         setupPieChart();
         setupPaymentTypePieChart();
+    }
+    public Button getResetFilterButton() {
+        return resetFilterButton;
     }
 
     private void setupTable() {
@@ -127,16 +131,19 @@ public class TransactionView {
         VBox dateFilterBox = new VBox(10);
         dateFilterBox.setPadding(new Insets(10));
 
+        HBox buttonBox = new HBox(10, filterButton, resetFilterButton);
+
         HBox datePickers = new HBox(10);
         datePickers.getChildren().addAll(
                 new Label("Start Date:"), startDatePicker,
                 new Label("End Date:"), endDatePicker
         );
 
-        dateFilterBox.getChildren().addAll(filterButton, datePickers);
+        dateFilterBox.getChildren().addAll(buttonBox, datePickers);
 
         return dateFilterBox;
     }
+
 
     public void show(Stage stage) {
         this.stage = stage;

@@ -9,6 +9,8 @@ public class Transaction {
     private String paymentType;
     private int paymentTypeId;
     private String comment;
+    private String location;
+    private int typeId;
 
     public Transaction(int id, double amount, String date, String categoryName, String paymentType, String comment) {
         this.id = id;
@@ -19,12 +21,14 @@ public class Transaction {
         this.comment = comment;
     }
 
-    public Transaction(double amount, String date, int categoryId, int paymentTypeId, String comment) {
+    public Transaction(double amount, String date, int categoryId, int paymentTypeId, String comment, String location, int typeId) {
         this.amount = amount;
         this.date = date;
         this.categoryId = categoryId;
         this.paymentTypeId = paymentTypeId;
         this.comment = comment;
+        this.location = location;
+        this.typeId = typeId;
     }
 
     public int getId() {
@@ -90,4 +94,10 @@ public class Transaction {
     public void setComment(String comment) {
         this.comment = comment;
     }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+
+    public int getTypeId() { return typeId; }
+    public void setTypeId(int typeId) { this.typeId = typeId; }
+
 }

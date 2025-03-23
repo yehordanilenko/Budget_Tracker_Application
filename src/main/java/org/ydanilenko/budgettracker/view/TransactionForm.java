@@ -25,13 +25,12 @@ public class TransactionForm {
         popupStage.initOwner(parentStage);
         popupStage.setTitle("Add Transaction");
 
-        // Input fields
         TextField amountField = new TextField();
         DatePicker dateField = new DatePicker(LocalDate.now());
         ComboBox<String> categoryField = new ComboBox<>(FXCollections.observableArrayList(transactionDAO.getAllCategories()));
         ComboBox<String> paymentTypeField = new ComboBox<>(FXCollections.observableArrayList("Cash", "Card", "Bank Transfer", "Other"));
         TextField commentField = new TextField();
-
+        TextField locationField = new TextField();
         Button saveButton = new Button("Add Transaction");
         saveButton.setOnAction(e -> {
             if (amountField.getText().isEmpty() || dateField.getValue() == null ||
@@ -51,13 +50,13 @@ public class TransactionForm {
                 int categoryId = transactionDAO.getCategoryIdByName(category);
                 String paymentType = paymentTypeField.getValue();
                 int paymentTypeId = transactionDAO.getPaymentTypeIdByName(paymentType);
-
                 String comment = commentField.getText();
+                String location = locationField.getText();
 
-                boolean success = transactionDAO.addTransaction(new Transaction(amount, dateField.getValue().toString(), categoryId, paymentTypeId, comment));
+                boolean success = transactionDAO.addTransaction(new Transaction(amount, dateField.getValue().toString(), categoryId, paymentTypeId, comment, location, 0));
 
                 if (success) {
-                    onTransactionAdded.run(); // Refresh the main table
+                    onTransactionAdded.run();
                     popupStage.close();
                 } else {
                     showError("Failed to add transaction.");
@@ -67,7 +66,6 @@ public class TransactionForm {
             }
         });
 
-        // Layout (Form UI)
         GridPane form = new GridPane();
         form.setPadding(new Insets(10));
         form.setHgap(10);

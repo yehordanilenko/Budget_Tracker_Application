@@ -26,6 +26,11 @@ public class TransactionController {
             transactionForm.show(transactionView.getStage(), this::updateTransactionList);
         });
 
+        transactionView.getResetFilterButton().setOnAction(e -> {
+            transactionView.getStartDatePicker().setValue(null);
+            transactionView.getEndDatePicker().setValue(null);
+            updateTransactionList();
+        });
         transactionView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange());
     }
 

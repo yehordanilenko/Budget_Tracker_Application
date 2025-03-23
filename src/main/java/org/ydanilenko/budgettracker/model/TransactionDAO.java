@@ -12,27 +12,32 @@ public class TransactionDAO {
     }
 
     public boolean addTransaction(Transaction transaction) {
-        String sql = "INSERT INTO Transactions (amount, date, category, paymentType, comment) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setDouble(1, transaction.getAmount());
-            pstmt.setString(2, transaction.getDate());
-            pstmt.setInt(3, transaction.getCategoryId());
-            pstmt.setInt(4, transaction.getPaymentTypeId());
-            pstmt.setString(5, transaction.getComment());
-            pstmt.executeUpdate();
-            return true;
+        String sql = "INSERT INTO Transactions (amount, date, category_id, payment_type_id, comment, location, type_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setDouble(1, transaction.getAmount());
+            ps.setString(2, transaction.getDate());
+            ps.setInt(3, transaction.getCategoryId());
+            ps.setInt(4, transaction.getPaymentTypeId());
+            ps.setString(5, transaction.getComment());
+            ps.setString(6, transaction.getLocation());
+            ps.setInt(7, 0); // Set type_id = 0 for expense
+
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
+
     public List<Transaction> getAllTransactions() {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT t.id, t.amount, t.date, c.name AS categoryName, p.name AS paymentType, t.comment " +
                 "FROM Transactions t " +
-                "JOIN Categories c ON t.category = c.id " +
-                "JOIN PaymentTypes p ON t.paymentType = p.id";
+                "JOIN Categories c ON t.category_id = c.id " +
+                "JOIN PaymentTypes p ON t.payment_type_id = p.id";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
