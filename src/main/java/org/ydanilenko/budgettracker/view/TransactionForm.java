@@ -14,6 +14,7 @@ import java.time.LocalDate;
 
 public class TransactionForm {
     private final TransactionDAO transactionDAO;
+    private final TextField locationField = new TextField();
 
     public TransactionForm(TransactionDAO transactionDAO) {
         this.transactionDAO = transactionDAO;
@@ -31,6 +32,7 @@ public class TransactionForm {
         ComboBox<String> paymentTypeField = new ComboBox<>(FXCollections.observableArrayList("Cash", "Card", "Bank Transfer", "Other"));
         TextField commentField = new TextField();
         TextField locationField = new TextField();
+
         Button saveButton = new Button("Add Transaction");
         saveButton.setOnAction(e -> {
             if (amountField.getText().isEmpty() || dateField.getValue() == null ||
@@ -81,7 +83,9 @@ public class TransactionForm {
         form.add(paymentTypeField, 1, 3);
         form.add(new Label("Comment:"), 0, 4);
         form.add(commentField, 1, 4);
-        form.add(saveButton, 1, 5);
+        form.add(new Label("Location:"), 0, 5);
+        form.add(locationField, 1, 5);
+        form.add(saveButton, 1, 6);
 
         Scene scene = new Scene(form, 350, 300);
         popupStage.setScene(scene);

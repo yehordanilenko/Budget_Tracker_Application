@@ -34,7 +34,7 @@ public class TransactionDAO {
 
     public List<Transaction> getAllTransactions() {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT t.id, t.amount, t.date, c.name AS categoryName, p.name AS paymentType, t.comment " +
+        String sql = "SELECT t.id, t.amount, t.date, c.name AS categoryName, p.name AS paymentType, t.comment, t.location " +
                 "FROM Transactions t " +
                 "JOIN Categories c ON t.category_id = c.id " +
                 "JOIN PaymentTypes p ON t.payment_type_id = p.id";
@@ -48,10 +48,11 @@ public class TransactionDAO {
                 String categoryName = rs.getString("categoryName");
                 String paymentType = rs.getString("paymentType");
                 String comment = rs.getString("comment");
+                String location = rs.getString("location");
 
                 System.out.println("Transaction: " + id + ", " + amount + ", " + date + ", " + categoryName + ", " + paymentType + ", " + comment);
 
-                transactions.add(new Transaction(id, amount, date, categoryName, paymentType, comment));
+                transactions.add(new Transaction(id, amount, date, categoryName, paymentType, comment, location));
             }
         } catch (SQLException e) {
             e.printStackTrace();

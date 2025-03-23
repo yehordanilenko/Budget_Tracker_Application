@@ -12,13 +12,14 @@ public class Transaction {
     private String location;
     private int typeId;
 
-    public Transaction(int id, double amount, String date, String categoryName, String paymentType, String comment) {
+    public Transaction(int id, double amount, String date, String categoryName, String paymentType, String comment,String location) {
         this.id = id;
         this.amount = amount;
         this.date = date;
         this.categoryName = categoryName;
         this.paymentType = paymentType;
         this.comment = comment;
+        this.location = location;
     }
 
     public Transaction(double amount, String date, int categoryId, int paymentTypeId, String comment, String location, int typeId) {

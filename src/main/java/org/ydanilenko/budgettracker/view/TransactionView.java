@@ -66,7 +66,17 @@ public class TransactionView {
         TableColumn<Transaction, String> commentColumn = new TableColumn<>("Comment");
         commentColumn.setCellValueFactory(new PropertyValueFactory<>("comment"));
 
-        table.getColumns().addAll(amountColumn, dateColumn, categoryColumn, paymentTypeColumn, commentColumn);
+        TableColumn<Transaction, String> locationColumn = new TableColumn<>("Location");
+        locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
+
+        table.getColumns().addAll(
+                amountColumn,
+                dateColumn,
+                categoryColumn,
+                paymentTypeColumn,
+                commentColumn,
+                locationColumn
+        );
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
