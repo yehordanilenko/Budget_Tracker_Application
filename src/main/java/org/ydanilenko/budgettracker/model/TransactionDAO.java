@@ -61,6 +61,60 @@ public class TransactionDAO {
         return transactions;
     }
 
+    public List<Transaction> getTransactionsByType(int typeId) {
+        List<Transaction> transactions = new ArrayList<>();
+
+        String sql = "SELECT t.id, t.amount, t.date, c.name AS categoryName, p.name AS paymentType, " +
+                "t.comment, t.location, t.type_id " +
+                "FROM Transactions t " +
+                "JOIN Categories c ON t.category_id = c.id " +
+                "JOIN PaymentTypes p ON t.payment_type_id = p.id " +
+                "WHERE t.type_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, typeId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Transaction transaction = new Transaction(
+                        rs.getDouble("amount"),
+                        rs.getString("date"),
+                        -1,
+                        -1,
+                        rs.getString("comment"),
+                        rs.getString("location"),
+                        rs.getInt("type_id")
+                );
+                transaction.setId(rs.getInt("id"));
+                transaction.setCategoryName(rs.getString("categoryName"));
+                transaction.setPaymentType(rs.getString("paymentType"));
+                transactions.add(transaction);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return transactions;
+    }
+
+    public List<String> getAllPaymentTypes() {
+        List<String> types = new ArrayList<>();
+        String sql = "SELECT name FROM PaymentTypes";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                types.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return types;
+    }
+
+
     public List<String> getAllCategories() {
         List<String> categories = new ArrayList<>();
         String sql = "SELECT name FROM Categories";

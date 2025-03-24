@@ -3,6 +3,7 @@ package org.ydanilenko.budgettracker.controller;
 import javafx.collections.FXCollections;
 import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
+import org.ydanilenko.budgettracker.view.IncomeView;
 import org.ydanilenko.budgettracker.view.TransactionForm;
 import org.ydanilenko.budgettracker.view.TransactionView;
 
@@ -33,16 +34,19 @@ public class TransactionController {
         });
 
         transactionView.getSwitchToIncomeButton().setOnAction(e -> {
-            System.out.println("Switch to income page clicked."); // temporary
-
-            // TODO: Replace this with actual IncomePage logic
+            IncomeView incomeView = new IncomeView(transactionView.getStage());
+            incomeView.setExpenseView(transactionView);
+            IncomeController incomeController = new IncomeController(transactionDAO, incomeView);
+            incomeController.initialize();
+            incomeView.show();
         });
+
 
         transactionView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange());
     }
 
     public void updateTransactionList() {
-        allTransactions = transactionDAO.getAllTransactions();
+        allTransactions = transactionDAO.getTransactionsByType(0);
         transactionView.displayTransactions(allTransactions);
     }
 
