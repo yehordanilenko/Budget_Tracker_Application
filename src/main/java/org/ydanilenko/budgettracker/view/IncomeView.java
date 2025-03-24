@@ -119,6 +119,7 @@ public class IncomeView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         HBox header = new HBox(10, title, spacer, switchToExpenseButton);
+        header.setPadding(new Insets(10)); // add spacing from all sides
         layout.setTop(header);
 
         HBox charts = new HBox(20, categoryChart, paymentTypeChart);
@@ -154,7 +155,7 @@ public class IncomeView {
 
         Scene scene = new Scene(layout, 1000, 700);
         stage.setScene(scene);
-        stage.setTitle("Income Tracker");
+        stage.setTitle("Budget Tracker");
         stage.show();
     }
 
