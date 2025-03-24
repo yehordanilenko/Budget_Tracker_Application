@@ -32,6 +32,8 @@ public class TransactionView {
     private Stage stage;
     private final Button resetFilterButton = new Button("Reset Filter");
     private final Button switchToIncomeButton = new Button("→ Income Page");
+    private final Button showCategoryChartButton = new Button("Spending by Category");
+    private final Button showPaymentChartButton = new Button("Spending by Payment Type");
 
     public TransactionView(Stage stage) {
         this.stage = stage;
@@ -174,14 +176,18 @@ public class TransactionView {
         header.getChildren().addAll(title, spacer, switchToIncomeButton);
 
         layout.setTop(header);
-        //layout.setTop(title);
+
         BorderPane.setMargin(title, new Insets(10));
 
         HBox pieChartsBox = new HBox(20);
+
         pieChartsBox.getChildren().addAll(pieChart, paymentTypePieChart);
+        HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton);
 
         VBox pieAndFilterBox = new VBox(20);
-        pieAndFilterBox.getChildren().addAll(pieChartsBox, createDateRangeFilter());
+
+        pieAndFilterBox.getChildren().add(0, chartButtonBox);
+        pieAndFilterBox.getChildren().addAll(createDateRangeFilter());
 
         HBox bottomControls = new HBox(10);
         bottomControls.getChildren().addAll(addButton);
@@ -196,6 +202,15 @@ public class TransactionView {
         stage.setTitle("Budget Tracker");
         stage.show();
     }
+
+    public Button getShowCategoryChartButton() {
+        return showCategoryChartButton;
+    }
+
+    public Button getShowPaymentChartButton() {
+        return showPaymentChartButton;
+    }
+
 
     public void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

@@ -1,6 +1,14 @@
 package org.ydanilenko.budgettracker.controller;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
 import org.ydanilenko.budgettracker.view.IncomeView;
@@ -11,12 +19,14 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TransactionController {
     private final TransactionDAO transactionDAO;
     private final TransactionView transactionView;
     private List<Transaction> allTransactions;
+    private List<Transaction> visibleTransactions;
 
     public TransactionController(TransactionDAO transactionDAO, TransactionView transactionView) {
         this.transactionDAO = transactionDAO;
@@ -41,14 +51,66 @@ public class TransactionController {
             incomeView.show();
         });
 
+        transactionView.getShowCategoryChartButton().setOnAction(e ->
+                showPieChart("Spending by Category", groupByCategory(visibleTransactions))
+        );
+
+        transactionView.getShowPaymentChartButton().setOnAction(e ->
+                showPieChart("Spending by Payment Type", groupByPaymentType(visibleTransactions))
+        );
 
         transactionView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange());
     }
 
     public void updateTransactionList() {
         allTransactions = transactionDAO.getTransactionsByType(0);
-        transactionView.displayTransactions(allTransactions);
+        visibleTransactions = allTransactions; // default view shows all
+        transactionView.displayTransactions(visibleTransactions);
     }
+
+    private Map<String, Double> groupByCategory(List<Transaction> transactions) {
+        return transactions.stream().collect(Collectors.groupingBy(
+                Transaction::getCategoryName,
+                Collectors.summingDouble(Transaction::getAmount)
+        ));
+    }
+
+    private Map<String, Double> groupByPaymentType(List<Transaction> transactions) {
+        return transactions.stream().collect(Collectors.groupingBy(
+                Transaction::getPaymentType,
+                Collectors.summingDouble(Transaction::getAmount)
+        ));
+    }
+
+    private void showPieChart(String title, Map<String, Double> dataMap) {
+        Stage popup = new Stage();
+        popup.setTitle(title);
+        popup.initOwner(transactionView.getStage());
+        popup.initModality(Modality.WINDOW_MODAL);
+
+        double total = dataMap.values().stream().mapToDouble(Double::doubleValue).sum();
+        ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
+
+        for (Map.Entry<String, Double> entry : dataMap.entrySet()) {
+            double percentage = (entry.getValue() / total) * 100;
+            PieChart.Data slice = new PieChart.Data(entry.getKey(), entry.getValue());
+            slice.nameProperty().bind(Bindings.concat(entry.getKey(), " (", String.format("%.2f", percentage), "%)"));
+            data.add(slice);
+        }
+
+        PieChart chart = new PieChart(data);
+        chart.setLegendVisible(true);
+        chart.setTitle(title);
+
+        VBox layout = new VBox(chart);
+        layout.setPadding(new Insets(10));
+        Scene scene = new Scene(layout, 500, 400);
+
+        popup.setScene(scene);
+        popup.showAndWait();
+    }
+
+
 
     public void filterTransactionsByDateRange() {
         if (allTransactions == null || allTransactions.isEmpty()) {
@@ -83,8 +145,9 @@ public class TransactionController {
                     }
                 })
                 .collect(Collectors.toList());
-
-        transactionView.displayTransactions(filteredTransactions);
+        visibleTransactions = filteredTransactions;
+        transactionView.displayTransactions(visibleTransactions);
+       // transactionView.displayTransactions(filteredTransactions);
     }
 
     public void initialize() {
