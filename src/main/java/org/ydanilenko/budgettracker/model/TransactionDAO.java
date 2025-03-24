@@ -22,7 +22,7 @@ public class TransactionDAO {
             ps.setInt(4, transaction.getPaymentTypeId());
             ps.setString(5, transaction.getComment());
             ps.setString(6, transaction.getLocation());
-            ps.setInt(7, 0); // Set type_id = 0 for expense
+            ps.setInt(7, 0);
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {

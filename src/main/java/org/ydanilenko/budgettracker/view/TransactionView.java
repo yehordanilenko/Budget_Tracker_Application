@@ -8,18 +8,14 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.MouseEvent;
 import javafx.beans.binding.Bindings;
 
 import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class TransactionView {
     private final TableView<Transaction> table;

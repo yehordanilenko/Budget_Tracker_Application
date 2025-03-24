@@ -1,4 +1,3 @@
-
 package org.ydanilenko.budgettracker.controller;
 
 import javafx.collections.FXCollections;
@@ -65,7 +64,7 @@ public class IncomeController {
             String comment = incomeView.getCommentField().getText();
             String location = incomeView.getLocationField().getText();
 
-            Transaction transaction = new Transaction(amount, date.toString(), categoryId, paymentTypeId, comment, location, 1); // type_id = 1 (income)
+            Transaction transaction = new Transaction(amount, date.toString(), categoryId, paymentTypeId, comment, location, 1);
             boolean success = transactionDAO.addTransaction(transaction);
 
             if (success) {
@@ -81,7 +80,7 @@ public class IncomeController {
     }
 
     public void updateTransactionList() {
-        allTransactions = transactionDAO.getTransactionsByType(1); // income
+        allTransactions = transactionDAO.getTransactionsByType(1);
         incomeView.displayTransactions(allTransactions);
     }
 

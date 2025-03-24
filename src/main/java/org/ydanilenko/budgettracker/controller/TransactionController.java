@@ -64,7 +64,7 @@ public class TransactionController {
 
     public void updateTransactionList() {
         allTransactions = transactionDAO.getTransactionsByType(0);
-        visibleTransactions = allTransactions; // default view shows all
+        visibleTransactions = allTransactions;
         transactionView.displayTransactions(visibleTransactions);
     }
 
@@ -147,7 +147,6 @@ public class TransactionController {
                 .collect(Collectors.toList());
         visibleTransactions = filteredTransactions;
         transactionView.displayTransactions(visibleTransactions);
-       // transactionView.displayTransactions(filteredTransactions);
     }
 
     public void initialize() {

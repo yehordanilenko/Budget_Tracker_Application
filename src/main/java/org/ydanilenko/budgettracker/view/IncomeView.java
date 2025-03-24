@@ -1,4 +1,3 @@
-
 package org.ydanilenko.budgettracker.view;
 
 import javafx.beans.binding.Bindings;
@@ -9,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
@@ -119,7 +117,7 @@ public class IncomeView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         HBox header = new HBox(10, title, spacer, switchToExpenseButton);
-        header.setPadding(new Insets(10)); // add spacing from all sides
+        header.setPadding(new Insets(10));
         layout.setTop(header);
 
         HBox charts = new HBox(20, categoryChart, paymentTypeChart);
