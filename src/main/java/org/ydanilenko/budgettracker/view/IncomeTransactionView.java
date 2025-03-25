@@ -111,26 +111,22 @@ public class IncomeTransactionView {
     }
 
     public void show() {
+
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(10));
 
         Label title = new Label("Income Tracker");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+        HBox header = new HBox();
+        header.setPadding(new Insets(10));
+        header.setSpacing(10);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        HBox header = new HBox(10, title, spacer, switchToExpenseButton);
-        header.setPadding(new Insets(10));
+        header.getChildren().addAll(title, spacer, switchToExpenseButton);
         layout.setTop(header);
 
-        //HBox charts = new HBox(20, categoryChart, paymentTypeChart);
         HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton);
-
-        VBox pieAndFilterBox = new VBox(20);
-
-        pieAndFilterBox.getChildren().add(0, chartButtonBox);
-
-        VBox center = new VBox(10, table, pieAndFilterBox);
-        layout.setCenter(center);
 
         HBox filterRow = new HBox(10, filterButton, resetFilterButton);
         HBox dateRow = new HBox(10,
@@ -156,14 +152,18 @@ public class IncomeTransactionView {
         form.add(locationField, 1, 5);
         form.add(addButton, 1, 6);
 
-        VBox bottom = new VBox(10, filterRow, dateRow, form);
-        layout.setBottom(bottom);
+        VBox pieAndFilterBox = new VBox(20, chartButtonBox, filterRow, dateRow);
+        VBox mainCenter = new VBox(10, table, pieAndFilterBox);
+        layout.setCenter(mainCenter);
+
+        layout.setBottom(form);
 
         Scene scene = new Scene(layout, 1000, 700);
         stage.setScene(scene);
         stage.setTitle("Budget Tracker");
         stage.show();
     }
+
 
     public TextField getAmountField() { return amountField; }
     public DatePicker getDateField() { return dateField; }
