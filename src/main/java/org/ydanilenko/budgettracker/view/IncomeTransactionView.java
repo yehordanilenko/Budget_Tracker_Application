@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IncomeView {
+public class IncomeTransactionView {
     private final TableView<Transaction> table = new TableView<>();
     private final PieChart categoryChart = new PieChart();
     private final PieChart paymentTypeChart = new PieChart();
@@ -33,9 +33,11 @@ public class IncomeView {
     private final Button addButton = new Button("Add Income");
     private final Button switchToExpenseButton = new Button("← Expense Page");
     private final Stage stage;
-    private TransactionView expenseView;
+    private ExpenseTransactionView expenseView;
+    Button showCategoryChartButton = new Button("Income by Category");
+    Button showPaymentChartButton = new Button("Income by Payment Type");
 
-    public IncomeView(Stage stage) {
+    public IncomeTransactionView(Stage stage) {
         this.stage = stage;
         setupTable();
         setupCharts();
@@ -120,8 +122,14 @@ public class IncomeView {
         header.setPadding(new Insets(10));
         layout.setTop(header);
 
-        HBox charts = new HBox(20, categoryChart, paymentTypeChart);
-        VBox center = new VBox(10, table, charts);
+        //HBox charts = new HBox(20, categoryChart, paymentTypeChart);
+        HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton);
+
+        VBox pieAndFilterBox = new VBox(20);
+
+        pieAndFilterBox.getChildren().add(0, chartButtonBox);
+
+        VBox center = new VBox(10, table, pieAndFilterBox);
         layout.setCenter(center);
 
         HBox filterRow = new HBox(10, filterButton, resetFilterButton);
@@ -170,12 +178,20 @@ public class IncomeView {
     public DatePicker getStartDatePicker() { return startDatePicker; }
     public DatePicker getEndDatePicker() { return endDatePicker; }
 
-    public void setExpenseView(TransactionView view) {
+    public void setExpenseView(ExpenseTransactionView view) {
         this.expenseView = view;
     }
 
-    public TransactionView getExpenseView() {
+    public ExpenseTransactionView getExpenseView() {
         return expenseView;
+    }
+
+    public Button getShowCategoryChartButton() {
+        return showCategoryChartButton;
+    }
+
+    public Button getShowPaymentChartButton() {
+        return showPaymentChartButton;
     }
 
     public void showError(String msg) {
@@ -197,5 +213,9 @@ public class IncomeView {
         paymentTypeField.getSelectionModel().clearSelection();
         commentField.clear();
         locationField.clear();
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 }

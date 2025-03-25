@@ -11,9 +11,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
-import org.ydanilenko.budgettracker.view.IncomeView;
+import org.ydanilenko.budgettracker.view.IncomeTransactionView;
 import org.ydanilenko.budgettracker.view.TransactionForm;
-import org.ydanilenko.budgettracker.view.TransactionView;
+import org.ydanilenko.budgettracker.view.ExpenseTransactionView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -22,13 +22,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class TransactionController {
+public class ExpenseTransactionController {
     private final TransactionDAO transactionDAO;
-    private final TransactionView transactionView;
+    private final ExpenseTransactionView transactionView;
     private List<Transaction> allTransactions;
     private List<Transaction> visibleTransactions;
 
-    public TransactionController(TransactionDAO transactionDAO, TransactionView transactionView) {
+    public ExpenseTransactionController(TransactionDAO transactionDAO, ExpenseTransactionView transactionView) {
         this.transactionDAO = transactionDAO;
         this.transactionView = transactionView;
 
@@ -44,9 +44,9 @@ public class TransactionController {
         });
 
         transactionView.getSwitchToIncomeButton().setOnAction(e -> {
-            IncomeView incomeView = new IncomeView(transactionView.getStage());
+            IncomeTransactionView incomeView = new IncomeTransactionView(transactionView.getStage());
             incomeView.setExpenseView(transactionView);
-            IncomeController incomeController = new IncomeController(transactionDAO, incomeView);
+            IncomeTransactionController incomeController = new IncomeTransactionController(transactionDAO, incomeView);
             incomeController.initialize();
             incomeView.show();
         });

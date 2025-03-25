@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TransactionView {
+public class ExpenseTransactionView {
     private final TableView<Transaction> table;
     private final PieChart pieChart;
     private final PieChart paymentTypePieChart;
@@ -31,7 +31,7 @@ public class TransactionView {
     private final Button showCategoryChartButton = new Button("Spending by Category");
     private final Button showPaymentChartButton = new Button("Spending by Payment Type");
 
-    public TransactionView(Stage stage) {
+    public ExpenseTransactionView(Stage stage) {
         this.stage = stage;
         this.table = new TableView<>();
         this.pieChart = new PieChart();
@@ -160,7 +160,7 @@ public class TransactionView {
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(10));
 
-        Label title = new Label("Budget Tracker");
+        Label title = new Label("Expense Tracker");
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
         HBox header = new HBox();
@@ -170,7 +170,6 @@ public class TransactionView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         header.getChildren().addAll(title, spacer, switchToIncomeButton);
-
         layout.setTop(header);
 
         BorderPane.setMargin(title, new Insets(10));

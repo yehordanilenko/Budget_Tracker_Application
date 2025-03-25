@@ -3,10 +3,10 @@ package org.ydanilenko.budgettracker;
 import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.ydanilenko.budgettracker.controller.TransactionController;
+import org.ydanilenko.budgettracker.controller.ExpenseTransactionController;
 import org.ydanilenko.budgettracker.util.DatabaseConnection;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
-import org.ydanilenko.budgettracker.view.TransactionView;
+import org.ydanilenko.budgettracker.view.ExpenseTransactionView;
 
 public class Main extends Application {
     @Override
@@ -14,8 +14,8 @@ public class Main extends Application {
         var connection = DatabaseConnection.getConnection();
 
         TransactionDAO transactionDAO = new TransactionDAO(connection);
-        TransactionView transactionView = new TransactionView(primaryStage);
-        TransactionController transactionController = new TransactionController(transactionDAO, transactionView);
+        ExpenseTransactionView transactionView = new ExpenseTransactionView(primaryStage);
+        ExpenseTransactionController transactionController = new ExpenseTransactionController(transactionDAO, transactionView);
 
         Image icon = new Image(getClass().getResourceAsStream("/images/app_icon.png"));
         primaryStage.getIcons().add(icon);

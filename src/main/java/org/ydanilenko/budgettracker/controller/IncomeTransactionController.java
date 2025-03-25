@@ -1,23 +1,33 @@
 package org.ydanilenko.budgettracker.controller;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
-import org.ydanilenko.budgettracker.view.IncomeView;
-import org.ydanilenko.budgettracker.view.TransactionView;
+import org.ydanilenko.budgettracker.view.IncomeTransactionView;
+import org.ydanilenko.budgettracker.view.ExpenseTransactionView;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-public class IncomeController {
+public class IncomeTransactionController {
     private final TransactionDAO transactionDAO;
-    private final IncomeView incomeView;
+    private final IncomeTransactionView incomeView;
     private List<Transaction> allTransactions;
+    private List<Transaction> visibleTransactions;
 
-    public IncomeController(TransactionDAO transactionDAO, IncomeView incomeView) {
+    public IncomeTransactionController(TransactionDAO transactionDAO, IncomeTransactionView incomeView) {
         this.transactionDAO = transactionDAO;
         this.incomeView = incomeView;
 
@@ -33,11 +43,18 @@ public class IncomeController {
         });
 
         incomeView.getSwitchToExpenseButton().setOnAction(e -> {
-            TransactionView expenseView = incomeView.getExpenseView();
-            new TransactionController(transactionDAO, expenseView).initialize();
+            ExpenseTransactionView expenseView = incomeView.getExpenseView();
+            new ExpenseTransactionController(transactionDAO, expenseView).initialize();
             expenseView.show(expenseView.getStage());
         });
 
+        incomeView.getShowCategoryChartButton().setOnAction(e ->
+                showPieChart("Income by Category", groupByCategory(visibleTransactions))
+        );
+
+        incomeView.getShowPaymentChartButton().setOnAction(e ->
+                showPieChart("Income by Payment Type", groupByPaymentType(visibleTransactions))
+        );
     }
 
     public void addTransaction() {
@@ -81,7 +98,8 @@ public class IncomeController {
 
     public void updateTransactionList() {
         allTransactions = transactionDAO.getTransactionsByType(1);
-        incomeView.displayTransactions(allTransactions);
+        visibleTransactions = allTransactions;
+        incomeView.displayTransactions(visibleTransactions);
     }
 
     public void filterTransactionsByDateRange() {
@@ -118,7 +136,50 @@ public class IncomeController {
                 })
                 .collect(Collectors.toList());
 
-        incomeView.displayTransactions(filteredTransactions);
+        visibleTransactions = filteredTransactions;
+        incomeView.displayTransactions(visibleTransactions);
+    }
+
+    private void showPieChart(String title, Map<String, Double> dataMap) {
+        Stage popup = new Stage();
+        popup.setTitle(title);
+        popup.initOwner(incomeView.getStage());
+        popup.initModality(Modality.WINDOW_MODAL);
+
+        double total = dataMap.values().stream().mapToDouble(Double::doubleValue).sum();
+        ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
+
+        for (Map.Entry<String, Double> entry : dataMap.entrySet()) {
+            double percentage = (entry.getValue() / total) * 100;
+            PieChart.Data slice = new PieChart.Data(entry.getKey(), entry.getValue());
+            slice.nameProperty().bind(Bindings.concat(entry.getKey(), " (", String.format("%.2f", percentage), "%)"));
+            data.add(slice);
+        }
+
+        PieChart chart = new PieChart(data);
+        chart.setLegendVisible(true);
+        chart.setTitle(title);
+
+        VBox layout = new VBox(chart);
+        layout.setPadding(new Insets(10));
+        Scene scene = new Scene(layout, 500, 400);
+
+        popup.setScene(scene);
+        popup.showAndWait();
+    }
+
+    private Map<String, Double> groupByCategory(List<Transaction> transactions) {
+        return transactions.stream().collect(Collectors.groupingBy(
+                Transaction::getCategoryName,
+                Collectors.summingDouble(Transaction::getAmount)
+        ));
+    }
+
+    private Map<String, Double> groupByPaymentType(List<Transaction> transactions) {
+        return transactions.stream().collect(Collectors.groupingBy(
+                Transaction::getPaymentType,
+                Collectors.summingDouble(Transaction::getAmount)
+        ));
     }
 
     public void initialize() {
