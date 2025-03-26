@@ -39,7 +39,7 @@ public class ExpenseTransactionView {
         this.startDatePicker = new DatePicker();
         this.endDatePicker = new DatePicker();
         this.filterButton = new Button("Filter");
-        this.addButton = new Button("Add Transaction");
+        this.addButton = new Button("Add Expense");
 
         setupTable();
         setupPieChart();
@@ -166,30 +166,29 @@ public class ExpenseTransactionView {
         HBox header = new HBox();
         header.setPadding(new Insets(10));
         header.setSpacing(10);
-        header.setHgrow(title, Priority.ALWAYS);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         header.getChildren().addAll(title, spacer, switchToIncomeButton);
         layout.setTop(header);
 
-        BorderPane.setMargin(title, new Insets(10));
-
-        HBox pieChartsBox = new HBox(20);
-
-        pieChartsBox.getChildren().addAll(pieChart, paymentTypePieChart);
+        // Chart buttons row
         HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton);
 
-        VBox pieAndFilterBox = new VBox(20);
+        // Filter buttons
+        HBox filterRow = new HBox(10, filterButton, resetFilterButton);
 
-        pieAndFilterBox.getChildren().add(0, chartButtonBox);
-        pieAndFilterBox.getChildren().addAll(createDateRangeFilter());
+        // Date pickers
+        HBox dateRow = new HBox(10,
+                new Label("Start Date:"), startDatePicker,
+                new Label("End Date:"), endDatePicker
+        );
 
-        HBox bottomControls = new HBox(10);
-        bottomControls.getChildren().addAll(addButton);
+        VBox pieAndFilterBox = new VBox(20, chartButtonBox, filterRow, dateRow);
 
         VBox mainCenter = new VBox(10, table, pieAndFilterBox);
         layout.setCenter(mainCenter);
 
+        HBox bottomControls = new HBox(10, addButton);
         layout.setBottom(bottomControls);
 
         Scene scene = new Scene(layout, 1000, 700);
@@ -197,6 +196,7 @@ public class ExpenseTransactionView {
         stage.setTitle("Budget Tracker");
         stage.show();
     }
+
 
     public Button getShowCategoryChartButton() {
         return showCategoryChartButton;
