@@ -102,7 +102,13 @@ public class IncomeTransactionController {
 
     public void updateTransactionList() {
         allTransactions = transactionDAO.getTransactionsByType(1);
-        visibleTransactions = allTransactions;
+        LocalDate now = LocalDate.now();
+        visibleTransactions = allTransactions.stream()
+                .filter(t -> {
+                    LocalDate date = LocalDate.parse(t.getDate());
+                    return date.getMonth() == now.getMonth() && date.getYear() == now.getYear();
+                })
+                .collect(Collectors.toList());
         incomeView.displayTransactions(visibleTransactions);
     }
 
