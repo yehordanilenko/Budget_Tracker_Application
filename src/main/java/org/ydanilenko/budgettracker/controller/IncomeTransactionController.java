@@ -13,6 +13,7 @@ import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
 import org.ydanilenko.budgettracker.view.IncomeTransactionView;
 import org.ydanilenko.budgettracker.view.ExpenseTransactionView;
+import org.ydanilenko.budgettracker.view.TransactionForm;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -34,7 +35,10 @@ public class IncomeTransactionController {
         incomeView.getCategoryField().setItems(FXCollections.observableArrayList(transactionDAO.getAllCategories()));
         incomeView.getPaymentTypeField().setItems(FXCollections.observableArrayList(transactionDAO.getAllPaymentTypes()));
 
-        incomeView.getAddButton().setOnAction(e -> addTransaction());
+        incomeView.getAddButton().setOnAction(e -> {
+            TransactionForm transactionForm = new TransactionForm(transactionDAO, 1);
+            transactionForm.show(incomeView.getStage(), this::updateTransactionList);
+        });
         incomeView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange());
         incomeView.getResetFilterButton().setOnAction(e -> {
             incomeView.getStartDatePicker().setValue(null);

@@ -33,7 +33,7 @@ public class ExpenseTransactionController {
         this.transactionView = transactionView;
 
         transactionView.getAddButton().setOnAction(e -> {
-            TransactionForm transactionForm = new TransactionForm(transactionDAO);
+            TransactionForm transactionForm = new TransactionForm(transactionDAO, 0);
             transactionForm.show(transactionView.getStage(), this::updateTransactionList);
         });
 

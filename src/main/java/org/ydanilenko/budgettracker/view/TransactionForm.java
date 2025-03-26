@@ -15,9 +15,11 @@ import java.time.LocalDate;
 public class TransactionForm {
     private final TransactionDAO transactionDAO;
     private final TextField locationField = new TextField();
+    private final int typeId;
 
-    public TransactionForm(TransactionDAO transactionDAO) {
-        this.transactionDAO = transactionDAO;
+    public TransactionForm(TransactionDAO dao, int typeId) {
+        this.transactionDAO = dao;
+        this.typeId = typeId;
     }
 
     public void show(Stage parentStage, Runnable onTransactionAdded) {
@@ -55,7 +57,7 @@ public class TransactionForm {
                 String comment = commentField.getText();
                 String location = locationField.getText();
 
-                boolean success = transactionDAO.addTransaction(new Transaction(amount, dateField.getValue().toString(), categoryId, paymentTypeId, comment, location, 0));
+                boolean success = transactionDAO.addTransaction(new Transaction(amount, dateField.getValue().toString(), categoryId, paymentTypeId, comment, location, typeId));
 
                 if (success) {
                     onTransactionAdded.run();

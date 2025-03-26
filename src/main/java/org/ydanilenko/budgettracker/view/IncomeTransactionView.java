@@ -134,29 +134,14 @@ public class IncomeTransactionView {
                 new Label("End Date:"), endDatePicker
         );
 
-        GridPane form = new GridPane();
-        form.setPadding(new Insets(10));
-        form.setHgap(10);
-        form.setVgap(10);
-        form.add(new Label("Amount:"), 0, 0);
-        form.add(amountField, 1, 0);
-        form.add(new Label("Date:"), 0, 1);
-        form.add(dateField, 1, 1);
-        form.add(new Label("Category:"), 0, 2);
-        form.add(categoryField, 1, 2);
-        form.add(new Label("Payment Type:"), 0, 3);
-        form.add(paymentTypeField, 1, 3);
-        form.add(new Label("Comment:"), 0, 4);
-        form.add(commentField, 1, 4);
-        form.add(new Label("Location:"), 0, 5);
-        form.add(locationField, 1, 5);
-        form.add(addButton, 1, 6);
+        HBox bottomControls = new HBox(10);
+        bottomControls.getChildren().addAll(addButton);
 
         VBox pieAndFilterBox = new VBox(20, chartButtonBox, filterRow, dateRow);
         VBox mainCenter = new VBox(10, table, pieAndFilterBox);
         layout.setCenter(mainCenter);
 
-        layout.setBottom(form);
+        layout.setBottom(bottomControls);
 
         Scene scene = new Scene(layout, 1000, 700);
         stage.setScene(scene);
