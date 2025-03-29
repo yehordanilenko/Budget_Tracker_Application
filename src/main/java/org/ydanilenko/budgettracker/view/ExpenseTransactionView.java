@@ -171,13 +171,10 @@ public class ExpenseTransactionView {
         header.getChildren().addAll(title, spacer, switchToIncomeButton);
         layout.setTop(header);
 
-        // Chart buttons row
         HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton);
 
-        // Filter buttons
         HBox filterRow = new HBox(10, filterButton, resetFilterButton);
 
-        // Date pickers
         HBox dateRow = new HBox(10,
                 new Label("Start Date:"), startDatePicker,
                 new Label("End Date:"), endDatePicker

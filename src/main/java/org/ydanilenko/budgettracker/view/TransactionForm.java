@@ -28,12 +28,10 @@ public class TransactionForm {
         this.typeId = editingTransaction.getTypeId();
         this.editingTransaction = editingTransaction;
 
-        // UI setup
         Stage popupStage = new Stage();
         popupStage.initOwner(ownerStage);
         popupStage.initModality(Modality.APPLICATION_MODAL);
 
-        // Fields (reuse or recreate as needed)
         TextField amountField = new TextField(String.valueOf(editingTransaction.getAmount()));
         DatePicker dateField = new DatePicker(LocalDate.parse(editingTransaction.getDate()));
         ComboBox<String> categoryField = new ComboBox<>();
