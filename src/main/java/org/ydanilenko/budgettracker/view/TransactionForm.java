@@ -73,6 +73,26 @@ public class TransactionForm {
             }
         });
 
+        Button deleteButton = new Button("Delete Transaction");
+        deleteButton.setOnAction(e -> {
+            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmation.setTitle("Confirm Deletion");
+            confirmation.setHeaderText("Are you sure you want to delete this transaction?");
+            confirmation.setContentText("This action cannot be undone.");
+
+            confirmation.showAndWait().ifPresent(result -> {
+                if (result == ButtonType.OK) {
+                    boolean success = transactionDAO.deleteTransaction(editingTransaction.getId());
+                    if (success) {
+                        onFinish.run();
+                        popupStage.close();
+                    } else {
+                        showError("Failed to delete transaction.");
+                    }
+                }
+            });
+        });
+
         GridPane form = new GridPane();
         form.setPadding(new Insets(10));
         form.setHgap(10);
@@ -91,6 +111,7 @@ public class TransactionForm {
         form.add(new Label("Location:"), 0, 5);
         form.add(locationField, 1, 5);
         form.add(saveButton, 1, 6);
+        form.add(deleteButton, 1, 7);
 
         Scene scene = new Scene(form);
         popupStage.setScene(scene);
