@@ -6,6 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -14,6 +15,9 @@ import org.ydanilenko.budgettracker.model.TransactionDAO;
 import org.ydanilenko.budgettracker.view.IncomeTransactionView;
 import org.ydanilenko.budgettracker.view.TransactionForm;
 import org.ydanilenko.budgettracker.view.ExpenseTransactionView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ContextMenu;
+
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -24,42 +28,44 @@ import java.util.stream.Collectors;
 
 public class ExpenseTransactionController {
     private final TransactionDAO transactionDAO;
-    private final ExpenseTransactionView transactionView;
+    private final ExpenseTransactionView expenseTransactionView;
     private List<Transaction> allTransactions;
     private List<Transaction> visibleTransactions;
 
-    public ExpenseTransactionController(TransactionDAO transactionDAO, ExpenseTransactionView transactionView) {
+    public ExpenseTransactionController(TransactionDAO transactionDAO, ExpenseTransactionView expenseTransactionView) {
         this.transactionDAO = transactionDAO;
-        this.transactionView = transactionView;
+        this.expenseTransactionView = expenseTransactionView;
 
-        transactionView.getAddButton().setOnAction(e -> {
+        expenseTransactionView.getAddButton().setOnAction(e -> {
             TransactionForm transactionForm = new TransactionForm(transactionDAO, 0);
-            transactionForm.show(transactionView.getStage(), this::updateTransactionList);
+            transactionForm.show(expenseTransactionView.getStage(), this::updateTransactionList);
         });
 
-        transactionView.getResetFilterButton().setOnAction(e -> {
-            transactionView.getStartDatePicker().setValue(null);
-            transactionView.getEndDatePicker().setValue(null);
+        expenseTransactionView.getResetFilterButton().setOnAction(e -> {
+            expenseTransactionView.getStartDatePicker().setValue(null);
+            expenseTransactionView.getEndDatePicker().setValue(null);
             updateTransactionList();
         });
 
-        transactionView.getSwitchToIncomeButton().setOnAction(e -> {
-            IncomeTransactionView incomeView = new IncomeTransactionView(transactionView.getStage());
-            incomeView.setExpenseView(transactionView);
+        expenseTransactionView.getSwitchToIncomeButton().setOnAction(e -> {
+            IncomeTransactionView incomeView = new IncomeTransactionView(expenseTransactionView.getStage());
+            incomeView.setExpenseView(expenseTransactionView);
             IncomeTransactionController incomeController = new IncomeTransactionController(transactionDAO, incomeView);
             incomeController.initialize();
             incomeView.show();
         });
 
-        transactionView.getShowCategoryChartButton().setOnAction(e ->
+        expenseTransactionView.getShowCategoryChartButton().setOnAction(e ->
                 showPieChart("Spending by Category", groupByCategory(visibleTransactions))
         );
 
-        transactionView.getShowPaymentChartButton().setOnAction(e ->
+        expenseTransactionView.getShowPaymentChartButton().setOnAction(e ->
                 showPieChart("Spending by Payment Type", groupByPaymentType(visibleTransactions))
         );
 
-        transactionView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange());
+        expenseTransactionView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange());
+
+        setupContextMenu();
     }
 
     public void updateTransactionList() {
@@ -71,7 +77,7 @@ public class ExpenseTransactionController {
                     return date.getMonth() == now.getMonth() && date.getYear() == now.getYear();
                 })
                 .collect(Collectors.toList());
-        transactionView.displayTransactions(visibleTransactions);
+        expenseTransactionView.displayTransactions(visibleTransactions);
     }
 
     private Map<String, Double> groupByCategory(List<Transaction> transactions) {
@@ -91,7 +97,7 @@ public class ExpenseTransactionController {
     private void showPieChart(String title, Map<String, Double> dataMap) {
         Stage popup = new Stage();
         popup.setTitle(title);
-        popup.initOwner(transactionView.getStage());
+        popup.initOwner(expenseTransactionView.getStage());
         popup.initModality(Modality.WINDOW_MODAL);
 
         double total = dataMap.values().stream().mapToDouble(Double::doubleValue).sum();
@@ -120,20 +126,20 @@ public class ExpenseTransactionController {
 
     public void filterTransactionsByDateRange() {
         if (allTransactions == null || allTransactions.isEmpty()) {
-            transactionView.showError("No transactions to filter.");
+            expenseTransactionView.showError("No transactions to filter.");
             return;
         }
 
-        LocalDate startDate = transactionView.getStartDatePicker().getValue();
-        LocalDate endDate = transactionView.getEndDatePicker().getValue();
+        LocalDate startDate = expenseTransactionView.getStartDatePicker().getValue();
+        LocalDate endDate = expenseTransactionView.getEndDatePicker().getValue();
 
         if (endDate != null && endDate.isAfter(LocalDate.now())) {
-            transactionView.showError("End date cannot be later than today.");
+            expenseTransactionView.showError("End date cannot be later than today.");
             return;
         }
 
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
-            transactionView.showError("Start date cannot be after end date.");
+            expenseTransactionView.showError("Start date cannot be after end date.");
             return;
         }
 
@@ -152,8 +158,29 @@ public class ExpenseTransactionController {
                 })
                 .collect(Collectors.toList());
         visibleTransactions = filteredTransactions;
-        transactionView.displayTransactions(visibleTransactions);
+        expenseTransactionView.displayTransactions(visibleTransactions);
     }
+
+    private void setupContextMenu() {
+        TableView<Transaction> table = expenseTransactionView.getTable();
+
+        MenuItem editItem = new MenuItem("Edit");
+        editItem.setOnAction(e -> {
+            Transaction selected = expenseTransactionView.getSelectedTransaction();
+            if (selected != null) {
+                TransactionForm editForm = new TransactionForm(
+                        expenseTransactionView.getStage(),
+                        transactionDAO,
+                        this::updateTransactionList,
+                        selected
+                );
+            }
+        });
+
+        ContextMenu contextMenu = new ContextMenu(editItem);
+        table.setContextMenu(contextMenu);
+    }
+
 
     public void initialize() {
         updateTransactionList();

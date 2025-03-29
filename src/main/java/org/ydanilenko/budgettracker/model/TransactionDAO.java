@@ -1,5 +1,7 @@
 package org.ydanilenko.budgettracker.model;
 
+import org.ydanilenko.budgettracker.util.DatabaseConnection;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,27 @@ public class TransactionDAO {
             ps.setInt(7, transaction.getTypeId());
 
             return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateTransaction(Transaction transaction) {
+        String query = "UPDATE transactions SET amount = ?, date = ?, category_id = ?, payment_type_id = ?, comment = ?, location = ?, type_id = ? WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setDouble(1, transaction.getAmount());
+            stmt.setString(2, transaction.getDate());
+            stmt.setInt(3, transaction.getCategoryId());
+            stmt.setInt(4, transaction.getPaymentTypeId());
+            stmt.setString(5, transaction.getComment());
+            stmt.setString(6, transaction.getLocation());
+            stmt.setInt(7, transaction.getTypeId());
+            stmt.setInt(8, transaction.getId());
+
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

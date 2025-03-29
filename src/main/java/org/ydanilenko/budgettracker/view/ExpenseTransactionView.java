@@ -222,6 +222,15 @@ public class ExpenseTransactionView {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    public Transaction getSelectedTransaction() {
+        return table.getSelectionModel().getSelectedItem();
+    }
+
+    public TableView<Transaction> getTable() {
+        return table;
+    }
+
     public Button getAddButton() {
         return addButton;
     }

@@ -6,6 +6,9 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -15,6 +18,7 @@ import org.ydanilenko.budgettracker.view.IncomeTransactionView;
 import org.ydanilenko.budgettracker.view.ExpenseTransactionView;
 import org.ydanilenko.budgettracker.view.TransactionForm;
 
+import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -59,6 +63,8 @@ public class IncomeTransactionController {
         incomeView.getShowPaymentChartButton().setOnAction(e ->
                 showPieChart("Income by Payment Type", groupByPaymentType(visibleTransactions))
         );
+
+        setupContextMenu();
     }
 
     public void addTransaction() {
@@ -111,7 +117,7 @@ public class IncomeTransactionController {
                 .collect(Collectors.toList());
         incomeView.displayTransactions(visibleTransactions);
     }
-
+    
     public void filterTransactionsByDateRange() {
         if (allTransactions == null || allTransactions.isEmpty()) {
             incomeView.showError("No transactions to filter.");
@@ -149,6 +155,27 @@ public class IncomeTransactionController {
         visibleTransactions = filteredTransactions;
         incomeView.displayTransactions(visibleTransactions);
     }
+
+    private void setupContextMenu() {
+        TableView<Transaction> table = incomeView.getTable();
+
+        MenuItem editItem = new MenuItem("Edit");
+        editItem.setOnAction(e -> {
+            Transaction selected = incomeView.getSelectedTransaction();
+            if (selected != null) {
+                TransactionForm editForm = new TransactionForm(
+                        incomeView.getStage(),
+                        transactionDAO,
+                        this::updateTransactionList,
+                        selected
+                );
+            }
+        });
+
+        ContextMenu contextMenu = new ContextMenu(editItem);
+        table.setContextMenu(contextMenu);
+    }
+
 
     private void showPieChart(String title, Map<String, Double> dataMap) {
         Stage popup = new Stage();

@@ -149,6 +149,13 @@ public class IncomeTransactionView {
         stage.show();
     }
 
+    public Transaction getSelectedTransaction() {
+        return table.getSelectionModel().getSelectedItem();
+    }
+
+    public TableView<Transaction> getTable() {
+        return table;
+    }
 
     public TextField getAmountField() { return amountField; }
     public DatePicker getDateField() { return dateField; }

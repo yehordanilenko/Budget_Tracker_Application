@@ -32,6 +32,18 @@ public class Transaction {
         this.typeId = typeId;
     }
 
+    public Transaction(int id, double amount, String date, int categoryId, int paymentTypeId, String comment, String location, int typeId) {
+        this.id = id;
+        this.amount = amount;
+        this.date = date;
+        this.categoryId = categoryId;
+        this.paymentTypeId = paymentTypeId;
+        this.comment = comment;
+        this.location = location;
+        this.typeId = typeId;
+    }
+
+
     public int getId() {
         return id;
     }
