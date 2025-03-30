@@ -117,6 +117,71 @@ public class TransactionForm {
         popupStage.show();
     }
 
+    public TransactionForm(Stage parentStage, TransactionDAO dao, int typeId, Transaction copiedTransaction, Runnable onTransactionAdded) {
+        this.transactionDAO = dao;
+        this.typeId = typeId;
+
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.initOwner(parentStage);
+        popupStage.setTitle("Add Transaction (Copied)");
+
+        TextField amountField = new TextField(String.valueOf(copiedTransaction.getAmount()));
+        DatePicker dateField = new DatePicker(LocalDate.parse(copiedTransaction.getDate()));
+        ComboBox<String> categoryField = new ComboBox<>(FXCollections.observableArrayList(dao.getAllCategories()));
+        ComboBox<String> paymentTypeField = new ComboBox<>(FXCollections.observableArrayList(dao.getAllPaymentTypes()));
+        TextField commentField = new TextField(copiedTransaction.getComment());
+        TextField locationField = new TextField(copiedTransaction.getLocation());
+
+        categoryField.setValue(copiedTransaction.getCategoryName());
+        paymentTypeField.setValue(copiedTransaction.getPaymentType());
+
+        Button saveButton = new Button("Add Transaction");
+        saveButton.setOnAction(e -> {
+            try {
+                double amount = Double.parseDouble(amountField.getText());
+                String date = dateField.getValue().toString();
+                int categoryId = dao.getCategoryIdByName(categoryField.getValue());
+                int paymentTypeId = dao.getPaymentTypeIdByName(paymentTypeField.getValue());
+                String comment = commentField.getText();
+                String location = locationField.getText();
+
+                boolean success = dao.addTransaction(new Transaction(amount, date, categoryId, paymentTypeId, comment, location, typeId));
+                if (success) {
+                    onTransactionAdded.run(); // Refresh list
+                    popupStage.close();
+                } else {
+                    showError("Failed to add transaction.");
+                }
+            } catch (NumberFormatException ex) {
+                showError("Amount must be a valid number.");
+            }
+        });
+
+        GridPane form = new GridPane();
+        form.setPadding(new Insets(10));
+        form.setHgap(10);
+        form.setVgap(10);
+
+        form.add(new Label("Amount:"), 0, 0);
+        form.add(amountField, 1, 0);
+        form.add(new Label("Date:"), 0, 1);
+        form.add(dateField, 1, 1);
+        form.add(new Label("Category:"), 0, 2);
+        form.add(categoryField, 1, 2);
+        form.add(new Label("Payment Type:"), 0, 3);
+        form.add(paymentTypeField, 1, 3);
+        form.add(new Label("Comment:"), 0, 4);
+        form.add(commentField, 1, 4);
+        form.add(new Label("Location:"), 0, 5);
+        form.add(locationField, 1, 5);
+        form.add(saveButton, 1, 6);
+
+        Scene scene = new Scene(form, 350, 300);
+        popupStage.setScene(scene);
+        popupStage.showAndWait();
+    }
+
 
 
     public void show(Stage parentStage, Runnable onTransactionAdded) {

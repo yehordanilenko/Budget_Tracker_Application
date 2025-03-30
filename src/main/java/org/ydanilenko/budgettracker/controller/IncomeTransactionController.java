@@ -31,6 +31,7 @@ public class IncomeTransactionController {
     private final IncomeTransactionView incomeView;
     private List<Transaction> allTransactions;
     private List<Transaction> visibleTransactions;
+    private Transaction copiedTransaction = null;
 
     public IncomeTransactionController(TransactionDAO transactionDAO, IncomeTransactionView incomeView) {
         this.transactionDAO = transactionDAO;
@@ -43,6 +44,7 @@ public class IncomeTransactionController {
             TransactionForm transactionForm = new TransactionForm(transactionDAO, 1);
             transactionForm.show(incomeView.getStage(), this::updateTransactionList);
         });
+
         incomeView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange());
         incomeView.getResetFilterButton().setOnAction(e -> {
             incomeView.getStartDatePicker().setValue(null);
@@ -172,7 +174,21 @@ public class IncomeTransactionController {
             }
         });
 
-        ContextMenu contextMenu = new ContextMenu(editItem);
+        MenuItem copyItem = new MenuItem("Copy");
+        copyItem.setOnAction(e -> {
+            Transaction selected = incomeView.getSelectedTransaction();
+            if (selected != null) {
+                new TransactionForm(
+                        incomeView.getStage(),
+                        transactionDAO,
+                        1,
+                        selected,
+                        this::updateTransactionList
+                );
+            }
+        });
+
+        ContextMenu contextMenu = new ContextMenu(editItem, copyItem);
         table.setContextMenu(contextMenu);
     }
 

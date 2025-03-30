@@ -31,14 +31,15 @@ public class ExpenseTransactionController {
     private final ExpenseTransactionView expenseTransactionView;
     private List<Transaction> allTransactions;
     private List<Transaction> visibleTransactions;
+    private Transaction copiedTransaction = null;
 
     public ExpenseTransactionController(TransactionDAO transactionDAO, ExpenseTransactionView expenseTransactionView) {
         this.transactionDAO = transactionDAO;
         this.expenseTransactionView = expenseTransactionView;
 
         expenseTransactionView.getAddButton().setOnAction(e -> {
-            TransactionForm transactionForm = new TransactionForm(transactionDAO, 0);
-            transactionForm.show(expenseTransactionView.getStage(), this::updateTransactionList);
+            TransactionForm form = new TransactionForm(transactionDAO, 0);
+            form.show(expenseTransactionView.getStage(), this::updateTransactionList);
         });
 
         expenseTransactionView.getResetFilterButton().setOnAction(e -> {
@@ -122,8 +123,6 @@ public class ExpenseTransactionController {
         popup.showAndWait();
     }
 
-
-
     public void filterTransactionsByDateRange() {
         if (allTransactions == null || allTransactions.isEmpty()) {
             expenseTransactionView.showError("No transactions to filter.");
@@ -177,7 +176,21 @@ public class ExpenseTransactionController {
             }
         });
 
-        ContextMenu contextMenu = new ContextMenu(editItem);
+        MenuItem copyItem = new MenuItem("Copy");
+        copyItem.setOnAction(e -> {
+            Transaction selected = expenseTransactionView.getSelectedTransaction();
+            if (selected != null) {
+                new TransactionForm(
+                        expenseTransactionView.getStage(),
+                        transactionDAO,
+                        0,
+                        selected,
+                        this::updateTransactionList
+                );
+            }
+        });
+
+        ContextMenu contextMenu = new ContextMenu(editItem, copyItem);
         table.setContextMenu(contextMenu);
     }
 
