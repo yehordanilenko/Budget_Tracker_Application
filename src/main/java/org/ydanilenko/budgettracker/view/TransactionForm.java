@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
@@ -182,8 +183,6 @@ public class TransactionForm {
         popupStage.showAndWait();
     }
 
-
-
     public void show(Stage parentStage, Runnable onTransactionAdded) {
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);
@@ -196,6 +195,16 @@ public class TransactionForm {
         ComboBox<String> paymentTypeField = new ComboBox<>(FXCollections.observableArrayList("Cash", "Card", "Bank Transfer", "Other"));
         TextField commentField = new TextField();
         TextField locationField = new TextField();
+
+        Button clearButton = new Button("Clear Fields");
+        clearButton.setOnAction(e -> {
+            amountField.clear();
+            dateField.setValue(LocalDate.now());
+            categoryField.getSelectionModel().clearSelection();
+            paymentTypeField.getSelectionModel().clearSelection();
+            commentField.clear();
+            locationField.clear();
+        });
 
         Button saveButton = new Button("Add Transaction");
         saveButton.setOnAction(e -> {
@@ -249,7 +258,8 @@ public class TransactionForm {
         form.add(commentField, 1, 4);
         form.add(new Label("Location:"), 0, 5);
         form.add(locationField, 1, 5);
-        form.add(saveButton, 1, 6);
+        HBox buttonBox = new HBox(10, saveButton, clearButton);
+        form.add(buttonBox, 1, 6);
 
         Scene scene = new Scene(form, 350, 300);
         popupStage.setScene(scene);
