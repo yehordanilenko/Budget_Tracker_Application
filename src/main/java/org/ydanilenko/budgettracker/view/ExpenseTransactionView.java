@@ -12,6 +12,9 @@ import javafx.beans.binding.Bindings;
 
 import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
+import org.ydanilenko.budgettracker.model.TransactionDAO;
+import org.ydanilenko.budgettracker.util.DatabaseConnection;
+import org.ydanilenko.budgettracker.view.PaymentTypeManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +33,7 @@ public class ExpenseTransactionView {
     private final Button switchToIncomeButton = new Button("→ Income Page");
     private final Button showCategoryChartButton = new Button("Spending by Category");
     private final Button showPaymentChartButton = new Button("Spending by Payment Type");
+    private final Button managePaymentTypesButton = new Button("Manage Payment Types");
 
     public ExpenseTransactionView(Stage stage) {
         this.stage = stage;
@@ -185,8 +189,16 @@ public class ExpenseTransactionView {
         VBox mainCenter = new VBox(10, table, pieAndFilterBox);
         layout.setCenter(mainCenter);
 
-        HBox bottomControls = new HBox(10, addButton);
+       // HBox bottomControls = new HBox(10, addButton);
+
+
+        managePaymentTypesButton.setOnAction(e -> {
+            new PaymentTypeManager(stage, new TransactionDAO(DatabaseConnection.getConnection()), this, null).show();
+        });
+
+        HBox bottomControls = new HBox(10, addButton, managePaymentTypesButton);
         layout.setBottom(bottomControls);
+
 
         Scene scene = new Scene(layout, 1000, 700);
         stage.setScene(scene);
@@ -230,6 +242,9 @@ public class ExpenseTransactionView {
 
     public Button getAddButton() {
         return addButton;
+    }
+    public Button getManagePaymentTypesButton() {
+        return managePaymentTypesButton;
     }
 
     public Button getSwitchToIncomeButton() {

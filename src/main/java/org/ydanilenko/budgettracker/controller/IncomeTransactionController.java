@@ -17,6 +17,7 @@ import org.ydanilenko.budgettracker.model.TransactionDAO;
 import org.ydanilenko.budgettracker.view.IncomeTransactionView;
 import org.ydanilenko.budgettracker.view.ExpenseTransactionView;
 import org.ydanilenko.budgettracker.view.TransactionForm;
+import org.ydanilenko.budgettracker.view.PaymentTypeManager;
 
 import java.awt.*;
 import java.time.LocalDate;
@@ -66,6 +67,14 @@ public class IncomeTransactionController {
                 showPieChart("Income by Payment Type", groupByPaymentType(visibleTransactions))
         );
 
+        incomeView.getManagePaymentTypesButton().setOnAction(e -> {
+            new PaymentTypeManager(
+                    incomeView.getStage(),
+                    transactionDAO,
+                    null,
+                    incomeView
+            ).show();
+        });
         setupContextMenu();
     }
 

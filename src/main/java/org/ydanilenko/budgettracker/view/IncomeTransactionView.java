@@ -11,6 +11,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
+import org.ydanilenko.budgettracker.model.TransactionDAO;
+import org.ydanilenko.budgettracker.util.DatabaseConnection;
+import org.ydanilenko.budgettracker.view.PaymentTypeManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +39,7 @@ public class IncomeTransactionView {
     private ExpenseTransactionView expenseView;
     Button showCategoryChartButton = new Button("Income by Category");
     Button showPaymentChartButton = new Button("Income by Payment Type");
+    private final Button managePaymentTypesButton = new Button("Manage Payment Types");
 
     public IncomeTransactionView(Stage stage) {
         this.stage = stage;
@@ -134,8 +138,13 @@ public class IncomeTransactionView {
                 new Label("End Date:"), endDatePicker
         );
 
-        HBox bottomControls = new HBox(10);
-        bottomControls.getChildren().addAll(addButton);
+      //  HBox bottomControls = new HBox(10);
+        //bottomControls.getChildren().addAll(addButton);
+        managePaymentTypesButton.setOnAction(e -> {
+            new PaymentTypeManager(stage, new TransactionDAO(DatabaseConnection.getConnection()), null, this).show();
+        });
+
+        HBox bottomControls = new HBox(10, addButton, managePaymentTypesButton);
 
         VBox pieAndFilterBox = new VBox(20, chartButtonBox, filterRow, dateRow);
         VBox mainCenter = new VBox(10, table, pieAndFilterBox);
@@ -197,7 +206,9 @@ public class IncomeTransactionView {
         alert.setContentText(msg);
         alert.showAndWait();
     }
-
+    public Button getManagePaymentTypesButton() {
+        return managePaymentTypesButton;
+    }
     public void clearInputFields() {
         amountField.clear();
         dateField.setValue(null);

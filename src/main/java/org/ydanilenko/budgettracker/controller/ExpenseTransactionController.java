@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
 import org.ydanilenko.budgettracker.view.IncomeTransactionView;
+import org.ydanilenko.budgettracker.view.PaymentTypeManager;
 import org.ydanilenko.budgettracker.view.TransactionForm;
 import org.ydanilenko.budgettracker.view.ExpenseTransactionView;
 import javafx.scene.control.MenuItem;
@@ -63,6 +64,15 @@ public class ExpenseTransactionController {
         expenseTransactionView.getShowPaymentChartButton().setOnAction(e ->
                 showPieChart("Spending by Payment Type", groupByPaymentType(visibleTransactions))
         );
+
+        expenseTransactionView.getManagePaymentTypesButton().setOnAction(e -> {
+            new PaymentTypeManager(
+                    expenseTransactionView.getStage(),
+                    transactionDAO,
+                    expenseTransactionView,
+                    null
+            ).show();
+        });
 
         expenseTransactionView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange());
 

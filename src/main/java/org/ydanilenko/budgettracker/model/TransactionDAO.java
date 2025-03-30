@@ -194,4 +194,74 @@ public class TransactionDAO {
         return -1;
     }
 
+    public List<PaymentType> getAllPaymentTypeObjects() {
+        List<PaymentType> paymentTypes = new ArrayList<>();
+        String sql = "SELECT id, name, bank, issuer, issue_date, expiration_date FROM PaymentTypes";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                paymentTypes.add(new PaymentType(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("bank"),
+                        rs.getString("issuer"),
+                        rs.getString("issue_date"),
+                        rs.getString("expiration_date")
+                ));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return paymentTypes;
+    }
+
+    public boolean addPaymentType(PaymentType pt) {
+        String sql = "INSERT INTO PaymentTypes (name, bank, issuer, issue_date, expiration_date) VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, pt.getName());
+            stmt.setString(2, pt.getBank());
+            stmt.setString(3, pt.getIssuer());
+            stmt.setString(4, pt.getIssueDate());
+            stmt.setString(5, pt.getExpirationDate());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updatePaymentType(PaymentType pt) {
+        String sql = "UPDATE PaymentTypes SET name = ?, bank = ?, issuer = ?, issue_date = ?, expiration_date = ? WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, pt.getName());
+            stmt.setString(2, pt.getBank());
+            stmt.setString(3, pt.getIssuer());
+            stmt.setString(4, pt.getIssueDate());
+            stmt.setString(5, pt.getExpirationDate());
+            stmt.setInt(6, pt.getId());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deletePaymentType(int id) {
+        String sql = "DELETE FROM PaymentTypes WHERE id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

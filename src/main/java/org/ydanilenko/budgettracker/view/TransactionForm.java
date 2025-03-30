@@ -8,6 +8,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import org.ydanilenko.budgettracker.model.PaymentType;
 import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
 
@@ -36,15 +38,32 @@ public class TransactionForm {
         TextField amountField = new TextField(String.valueOf(editingTransaction.getAmount()));
         DatePicker dateField = new DatePicker(LocalDate.parse(editingTransaction.getDate()));
         ComboBox<String> categoryField = new ComboBox<>();
-        ComboBox<String> paymentTypeField = new ComboBox<>();
+
+        ComboBox<PaymentType> paymentTypeField = new ComboBox<>();
+        paymentTypeField.setItems(FXCollections.observableArrayList(dao.getAllPaymentTypeObjects()));
+        paymentTypeField.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(PaymentType pt) {
+                return pt == null ? "" : pt.getName();
+            }
+
+            @Override
+            public PaymentType fromString(String string) {
+                return paymentTypeField.getItems().stream()
+                        .filter(pt -> pt.getName().equals(string))
+                        .findFirst().orElse(null);
+            }
+        });
+        paymentTypeField.setValue(dao.getAllPaymentTypeObjects().stream()
+                .filter(pt -> pt.getName().equals(editingTransaction.getPaymentType()))
+                .findFirst().orElse(null));
+
+
         TextField commentField = new TextField(editingTransaction.getComment());
         TextField locationField = new TextField(editingTransaction.getLocation());
 
         categoryField.setItems(FXCollections.observableArrayList(dao.getAllCategories()));
         categoryField.setValue(editingTransaction.getCategoryName());
-
-        paymentTypeField.setItems(FXCollections.observableArrayList(dao.getAllPaymentTypes()));
-        paymentTypeField.setValue(editingTransaction.getPaymentType());
 
         Button saveButton = new Button("Update Transaction");
         saveButton.setOnAction(e -> {
@@ -52,7 +71,7 @@ public class TransactionForm {
                 double amount = Double.parseDouble(amountField.getText());
                 String date = dateField.getValue().toString();
                 int categoryId = dao.getCategoryIdByName(categoryField.getValue());
-                int paymentTypeId = dao.getPaymentTypeIdByName(paymentTypeField.getValue());
+                int paymentTypeId = paymentTypeField.getValue() != null ? paymentTypeField.getValue().getId() : -1;
                 String comment = commentField.getText();
                 String location = locationField.getText();
 
@@ -130,12 +149,31 @@ public class TransactionForm {
         TextField amountField = new TextField(String.valueOf(copiedTransaction.getAmount()));
         DatePicker dateField = new DatePicker(LocalDate.parse(copiedTransaction.getDate()));
         ComboBox<String> categoryField = new ComboBox<>(FXCollections.observableArrayList(dao.getAllCategories()));
-        ComboBox<String> paymentTypeField = new ComboBox<>(FXCollections.observableArrayList(dao.getAllPaymentTypes()));
+        ComboBox<PaymentType> paymentTypeField = new ComboBox<>(FXCollections.observableArrayList(dao.getAllPaymentTypeObjects()));
+        paymentTypeField.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(PaymentType pt) {
+                return pt == null ? "" : pt.getName();
+            }
+
+            @Override
+            public PaymentType fromString(String string) {
+                return paymentTypeField.getItems().stream()
+                        .filter(pt -> pt.getName().equals(string))
+                        .findFirst().orElse(null);
+            }
+        });
         TextField commentField = new TextField(copiedTransaction.getComment());
         TextField locationField = new TextField(copiedTransaction.getLocation());
 
         categoryField.setValue(copiedTransaction.getCategoryName());
-        paymentTypeField.setValue(copiedTransaction.getPaymentType());
+        paymentTypeField.setValue(
+                dao.getAllPaymentTypeObjects().stream()
+                        .filter(pt -> pt.getName().equals(copiedTransaction.getPaymentType()))
+                        .findFirst()
+                        .orElse(null)
+        );
+
 
         Button saveButton = new Button("Add Transaction");
         saveButton.setOnAction(e -> {
@@ -143,7 +181,7 @@ public class TransactionForm {
                 double amount = Double.parseDouble(amountField.getText());
                 String date = dateField.getValue().toString();
                 int categoryId = dao.getCategoryIdByName(categoryField.getValue());
-                int paymentTypeId = dao.getPaymentTypeIdByName(paymentTypeField.getValue());
+                int paymentTypeId = paymentTypeField.getValue() != null ? paymentTypeField.getValue().getId() : -1;
                 String comment = commentField.getText();
                 String location = locationField.getText();
 
@@ -192,7 +230,21 @@ public class TransactionForm {
         TextField amountField = new TextField();
         DatePicker dateField = new DatePicker(LocalDate.now());
         ComboBox<String> categoryField = new ComboBox<>(FXCollections.observableArrayList(transactionDAO.getAllCategories()));
-        ComboBox<String> paymentTypeField = new ComboBox<>(FXCollections.observableArrayList("Cash", "Card", "Bank Transfer", "Other"));
+        ComboBox<PaymentType> paymentTypeField = new ComboBox<>(FXCollections.observableArrayList(transactionDAO.getAllPaymentTypeObjects()));
+        paymentTypeField.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(PaymentType pt) {
+                return pt == null ? "" : pt.getName();
+            }
+
+            @Override
+            public PaymentType fromString(String string) {
+                return paymentTypeField.getItems().stream()
+                        .filter(pt -> pt.getName().equals(string))
+                        .findFirst().orElse(null);
+            }
+        });
+
         TextField commentField = new TextField();
         TextField locationField = new TextField();
 
@@ -223,7 +275,7 @@ public class TransactionForm {
 
                 String category = categoryField.getValue();
                 int categoryId = transactionDAO.getCategoryIdByName(category);
-                String paymentType = paymentTypeField.getValue();
+                String paymentType = paymentTypeField.getValue() != null ? paymentTypeField.getValue().getName() : null;
                 int paymentTypeId = transactionDAO.getPaymentTypeIdByName(paymentType);
                 String comment = commentField.getText();
                 String location = locationField.getText();
