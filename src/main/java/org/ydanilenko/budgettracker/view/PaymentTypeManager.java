@@ -35,11 +35,6 @@ public class PaymentTypeManager {
         Button addButton = new Button("Add");
         addButton.setOnAction(e -> showForm(null));
 
-        Button editButton = new Button("Edit");
-        editButton.setOnAction(e -> {
-            PaymentType selected = table.getSelectionModel().getSelectedItem();
-            if (selected != null) showForm(selected);
-        });
 
         Button deleteButton = new Button("Delete");
         deleteButton.setOnAction(e -> {
@@ -50,19 +45,22 @@ public class PaymentTypeManager {
             }
         });
 
-        HBox buttonBox = new HBox(10, addButton, editButton, deleteButton);
+        HBox buttonBox = new HBox(10, addButton, deleteButton);
         buttonBox.setPadding(new Insets(10));
 
         VBox layout = new VBox(10, table, buttonBox);
         layout.setPadding(new Insets(10));
 
         Scene scene = new Scene(layout, 600, 400);
+        setupContextMenu();
         window.setScene(scene);
 
         loadData();
     }
 
     private void setupTable() {
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
         TableColumn<PaymentType, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
@@ -124,7 +122,9 @@ public class PaymentTypeManager {
                     expDateField.getValue() != null ? expDateField.getValue().toString() : null
             );
 
-            boolean success = (pt == null) ? dao.addPaymentType(updated) : dao.updatePaymentType(updated);
+            boolean isNew = pt == null || pt.getId() == 0;
+            boolean success = isNew ? dao.addPaymentType(updated) : dao.updatePaymentType(updated);
+
             if (success) {
                 loadData();
                 formStage.close();
@@ -132,11 +132,21 @@ public class PaymentTypeManager {
                 showError("Failed to save payment type.");
             }
         });
+
         Button clearIssueDate = new Button("X");
         clearIssueDate.setOnAction(e -> issueDateField.setValue(null));
 
         Button clearExpDate = new Button("X");
         clearExpDate.setOnAction(e -> expDateField.setValue(null));
+
+        Button clearButton = new Button("Clear Fields");
+        clearButton.setOnAction(e -> {
+            nameField.clear();
+            bankField.clear();
+            issuerField.clear();
+            issueDateField.setValue(null);
+            expDateField.setValue(null);
+        });
 
 
         GridPane form = new GridPane();
@@ -153,7 +163,8 @@ public class PaymentTypeManager {
         form.add(issueDateField, 1, 3);
         form.add(new Label("Expiration Date:"), 0, 4);
         form.add(expDateField, 1, 4);
-        form.add(saveButton, 1, 5);
+        HBox buttons = new HBox(10, saveButton, clearButton);
+        form.add(buttons, 1, 5);
         HBox issueRow = new HBox(5, issueDateField, clearIssueDate);
         HBox expRow = new HBox(5, expDateField, clearExpDate);
         form.add(issueRow, 1, 3);
@@ -163,6 +174,50 @@ public class PaymentTypeManager {
         formStage.setScene(scene);
         formStage.showAndWait();
     }
+
+    private void setupContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem editItem = new MenuItem("Edit");
+        editItem.setOnAction(e -> {
+            PaymentType selected = table.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                showForm(selected);
+            }
+        });
+
+        MenuItem copyItem = new MenuItem("Copy");
+        copyItem.setOnAction(e -> {
+            PaymentType selected = table.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                // Create a new instance with the same data but no ID
+                PaymentType copied = new PaymentType(
+                        0,
+                        selected.getName(),
+                        selected.getBank(),
+                        selected.getIssuer(),
+                        selected.getIssueDate(),
+                        selected.getExpirationDate()
+                );
+                showForm(copied); // Show form prefilled, treated as a new entry
+            }
+        });
+
+        contextMenu.getItems().addAll(editItem, copyItem);
+
+        table.setRowFactory(tv -> {
+            TableRow<PaymentType> row = new TableRow<>();
+            row.setOnContextMenuRequested(e -> {
+                if (!row.isEmpty()) {
+                    table.getSelectionModel().select(row.getItem());
+                    contextMenu.show(row, e.getScreenX(), e.getScreenY());
+                }
+            });
+            return row;
+        });
+    }
+
+
 
     private boolean confirmDelete() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);

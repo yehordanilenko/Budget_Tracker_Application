@@ -66,7 +66,14 @@ public class IncomeTransactionView {
         TableColumn<Transaction, String> locationColumn = new TableColumn<>("Location");
         locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
 
-        table.getColumns().addAll(amountColumn, dateColumn, categoryColumn, paymentTypeColumn, commentColumn, locationColumn);
+        table.getColumns().addAll(
+                dateColumn,
+                locationColumn,
+                categoryColumn,
+                commentColumn,
+                paymentTypeColumn,
+                amountColumn
+        );
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
@@ -138,8 +145,6 @@ public class IncomeTransactionView {
                 new Label("End Date:"), endDatePicker
         );
 
-      //  HBox bottomControls = new HBox(10);
-        //bottomControls.getChildren().addAll(addButton);
         managePaymentTypesButton.setOnAction(e -> {
             new PaymentTypeManager(stage, new TransactionDAO(DatabaseConnection.getConnection()), null, this).show();
         });

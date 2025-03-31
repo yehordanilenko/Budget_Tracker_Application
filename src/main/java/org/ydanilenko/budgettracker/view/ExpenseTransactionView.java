@@ -73,12 +73,12 @@ public class ExpenseTransactionView {
         locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
 
         table.getColumns().addAll(
-                amountColumn,
                 dateColumn,
+                locationColumn,
                 categoryColumn,
-                paymentTypeColumn,
                 commentColumn,
-                locationColumn
+                paymentTypeColumn,
+                amountColumn
         );
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
@@ -188,9 +188,6 @@ public class ExpenseTransactionView {
 
         VBox mainCenter = new VBox(10, table, pieAndFilterBox);
         layout.setCenter(mainCenter);
-
-       // HBox bottomControls = new HBox(10, addButton);
-
 
         managePaymentTypesButton.setOnAction(e -> {
             new PaymentTypeManager(stage, new TransactionDAO(DatabaseConnection.getConnection()), this, null).show();
