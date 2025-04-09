@@ -28,7 +28,6 @@ public class IncomeTransactionView {
     private final ComboBox<String> categoryField = new ComboBox<>();
     private final ComboBox<String> paymentTypeField = new ComboBox<>();
     private final TextField commentField = new TextField();
-    private final TextField locationField = new TextField();
     private final DatePicker startDatePicker = new DatePicker();
     private final DatePicker endDatePicker = new DatePicker();
     private final Button filterButton = new Button("Filter");
@@ -40,6 +39,8 @@ public class IncomeTransactionView {
     Button showCategoryChartButton = new Button("Income by Category");
     Button showPaymentChartButton = new Button("Income by Payment Type");
     private final Button managePaymentTypesButton = new Button("Manage Payment Types");
+    private final ComboBox<String> placeField = new ComboBox<>();
+    private final ComboBox<String> beneficiaryField = new ComboBox<>();
 
     public IncomeTransactionView(Stage stage) {
         this.stage = stage;
@@ -63,12 +64,17 @@ public class IncomeTransactionView {
         TableColumn<Transaction, String> commentColumn = new TableColumn<>("Comment");
         commentColumn.setCellValueFactory(new PropertyValueFactory<>("comment"));
 
-        TableColumn<Transaction, String> locationColumn = new TableColumn<>("Location");
-        locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
+        TableColumn<Transaction, String> placeColumn = new TableColumn<>("Place");
+        placeColumn.setCellValueFactory(new PropertyValueFactory<>("placeName"));
+
+        TableColumn<Transaction, String> beneficiaryColumn = new TableColumn<>("Beneficiary");
+        beneficiaryColumn.setCellValueFactory(new PropertyValueFactory<>("beneficiaryName"));
+
 
         table.getColumns().addAll(
                 dateColumn,
-                locationColumn,
+                placeColumn,
+                beneficiaryColumn,
                 categoryColumn,
                 commentColumn,
                 paymentTypeColumn,
@@ -176,7 +182,6 @@ public class IncomeTransactionView {
     public ComboBox<String> getCategoryField() { return categoryField; }
     public ComboBox<String> getPaymentTypeField() { return paymentTypeField; }
     public TextField getCommentField() { return commentField; }
-    public TextField getLocationField() { return locationField; }
     public Button getAddButton() { return addButton; }
     public Button getFilterButton() { return filterButton; }
     public Button getResetFilterButton() { return resetFilterButton; }
@@ -220,8 +225,17 @@ public class IncomeTransactionView {
         categoryField.getSelectionModel().clearSelection();
         paymentTypeField.getSelectionModel().clearSelection();
         commentField.clear();
-        locationField.clear();
+        placeField.getSelectionModel().clearSelection();
+        beneficiaryField.getSelectionModel().clearSelection();
     }
+    public ComboBox<String> getPlaceField() {
+        return placeField;
+    }
+
+    public ComboBox<String> getBeneficiaryField() {
+        return beneficiaryField;
+    }
+
 
     public Stage getStage() {
         return stage;

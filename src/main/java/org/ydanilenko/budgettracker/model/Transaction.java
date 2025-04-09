@@ -9,38 +9,44 @@ public class Transaction {
     private String paymentType;
     private int paymentTypeId;
     private String comment;
-    private String location;
     private int typeId;
+    private int placeId;
+    private int beneficiaryId;
+    private String placeName;
+    private String beneficiaryName;
 
-    public Transaction(int id, double amount, String date, String categoryName, String paymentType, String comment,String location) {
+    public Transaction(double amount, String date, int categoryId, int paymentTypeId, String comment, int placeId, int beneficiaryId, int typeId)
+    {
+        this.amount = amount;
+        this.date = date;
+        this.categoryId = categoryId;
+        this.paymentTypeId = paymentTypeId;
+        this.comment = comment;
+        this.typeId = typeId;
+        this.placeId = placeId;
+        this.beneficiaryId = beneficiaryId;
+
+    }
+
+    public Transaction(int id, double amount, String date, int categoryId, int paymentTypeId, String comment, int typeId) {
+        this.id = id;
+        this.amount = amount;
+        this.date = date;
+        this.categoryId = categoryId;
+        this.paymentTypeId = paymentTypeId;
+        this.comment = comment;
+        this.typeId = typeId;
+    }
+
+    public Transaction(int id, double amount, String date, String categoryName, String paymentType, String comment, String placeName, String beneficiaryName) {
         this.id = id;
         this.amount = amount;
         this.date = date;
         this.categoryName = categoryName;
         this.paymentType = paymentType;
         this.comment = comment;
-        this.location = location;
-    }
-
-    public Transaction(double amount, String date, int categoryId, int paymentTypeId, String comment, String location, int typeId) {
-        this.amount = amount;
-        this.date = date;
-        this.categoryId = categoryId;
-        this.paymentTypeId = paymentTypeId;
-        this.comment = comment;
-        this.location = location;
-        this.typeId = typeId;
-    }
-
-    public Transaction(int id, double amount, String date, int categoryId, int paymentTypeId, String comment, String location, int typeId) {
-        this.id = id;
-        this.amount = amount;
-        this.date = date;
-        this.categoryId = categoryId;
-        this.paymentTypeId = paymentTypeId;
-        this.comment = comment;
-        this.location = location;
-        this.typeId = typeId;
+        this.placeName = placeName;
+        this.beneficiaryName = beneficiaryName;
     }
 
 
@@ -107,10 +113,19 @@ public class Transaction {
     public void setComment(String comment) {
         this.comment = comment;
     }
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
 
     public int getTypeId() { return typeId; }
     public void setTypeId(int typeId) { this.typeId = typeId; }
 
+    public int getPlaceId() { return placeId; }
+    public void setPlaceId(int placeId) { this.placeId = placeId; }
+
+    public int getBeneficiaryId() { return beneficiaryId; }
+    public void setBeneficiaryId(int beneficiaryId) { this.beneficiaryId = beneficiaryId; }
+
+    public String getPlaceName() { return placeName; }
+    public void setPlaceName(String placeName) { this.placeName = placeName; }
+
+    public String getBeneficiaryName() { return beneficiaryName; }
+    public void setBeneficiaryName(String beneficiaryName) { this.beneficiaryName = beneficiaryName; }
 }

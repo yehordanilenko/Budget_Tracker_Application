@@ -79,34 +79,36 @@ public class IncomeTransactionController {
     }
 
     public void addTransaction() {
-        if (incomeView.getAmountField().getText().isEmpty() ||
-                incomeView.getDateField().getValue() == null ||
-                incomeView.getCategoryField().getValue() == null ||
-                incomeView.getPaymentTypeField().getValue() == null) {
-            incomeView.showError("All fields are required.");
-            return;
-        }
-
         try {
             double amount = Double.parseDouble(incomeView.getAmountField().getText());
             LocalDate date = incomeView.getDateField().getValue();
-            if (date.isAfter(LocalDate.now())) {
-                incomeView.showError("The date cannot be later than today.");
-                return;
-            }
-
-            String category = incomeView.getCategoryField().getValue();
-            int categoryId = transactionDAO.getCategoryIdByName(category);
             String paymentTypeName = incomeView.getPaymentTypeField().getValue();
             int paymentTypeId = transactionDAO.getPaymentTypeIdByName(paymentTypeName);
             String comment = incomeView.getCommentField().getText();
-            String location = incomeView.getLocationField().getText();
+            String categoryName = incomeView.getCategoryField().getValue();
+            int categoryId = transactionDAO.getCategoryIdByName(categoryName);
 
-            Transaction transaction = new Transaction(amount, date.toString(), categoryId, paymentTypeId, comment, location, 1);
+            String placeName = incomeView.getPlaceField().getValue();
+            int placeId = transactionDAO.getPlaceIdByName(placeName);
+
+            String beneficiaryName = incomeView.getBeneficiaryField().getValue();
+            int beneficiaryId = transactionDAO.getBeneficiaryIdByName(beneficiaryName);
+
+            Transaction transaction = new Transaction(
+                    amount,
+                    date.toString(),
+                    categoryId,
+                    paymentTypeId,
+                    comment,
+                    placeId,
+                    beneficiaryId,
+                    1 // typeId for income
+            );
+
             boolean success = transactionDAO.addTransaction(transaction);
 
             if (success) {
-                incomeView.showSuccess("Income added successfully.");
+                incomeView.showSuccess("Income added successfully!");
                 updateTransactionList();
                 incomeView.clearInputFields();
             } else {
@@ -116,6 +118,7 @@ public class IncomeTransactionController {
             incomeView.showError("Amount must be a valid number.");
         }
     }
+
 
     public void updateTransactionList() {
         allTransactions = transactionDAO.getTransactionsByType(1);

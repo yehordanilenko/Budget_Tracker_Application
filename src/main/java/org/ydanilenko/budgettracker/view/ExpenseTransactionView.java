@@ -69,12 +69,17 @@ public class ExpenseTransactionView {
         TableColumn<Transaction, String> commentColumn = new TableColumn<>("Comment");
         commentColumn.setCellValueFactory(new PropertyValueFactory<>("comment"));
 
-        TableColumn<Transaction, String> locationColumn = new TableColumn<>("Location");
-        locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
+        TableColumn<Transaction, String> placeColumn = new TableColumn<>("Place");
+        placeColumn.setCellValueFactory(new PropertyValueFactory<>("placeName"));
+
+        TableColumn<Transaction, String> beneficiaryColumn = new TableColumn<>("Beneficiary");
+        beneficiaryColumn.setCellValueFactory(new PropertyValueFactory<>("beneficiaryName"));
+
 
         table.getColumns().addAll(
                 dateColumn,
-                locationColumn,
+                placeColumn,
+                beneficiaryColumn,
                 categoryColumn,
                 commentColumn,
                 paymentTypeColumn,

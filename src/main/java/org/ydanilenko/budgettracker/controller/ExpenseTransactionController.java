@@ -190,13 +190,15 @@ public class ExpenseTransactionController {
         copyItem.setOnAction(e -> {
             Transaction selected = expenseTransactionView.getSelectedTransaction();
             if (selected != null) {
-                new TransactionForm(
+                TransactionForm copiedForm = new TransactionForm(
                         expenseTransactionView.getStage(),
                         transactionDAO,
-                        0,
+                        selected.getTypeId(),
                         selected,
                         this::updateTransactionList
                 );
+                copiedForm.show(expenseTransactionView.getStage(), this::updateTransactionList);
+
             }
         });
 

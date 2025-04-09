@@ -14,8 +14,8 @@ public class TransactionDAO {
     }
 
     public boolean addTransaction(Transaction transaction) {
-        String sql = "INSERT INTO Transactions (amount, date, category_id, payment_type_id, comment, location, type_id) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Transactions (amount, date, category_id, payment_type_id, comment, place_id, beneficiary_id, type_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setDouble(1, transaction.getAmount());
@@ -23,8 +23,9 @@ public class TransactionDAO {
             ps.setInt(3, transaction.getCategoryId());
             ps.setInt(4, transaction.getPaymentTypeId());
             ps.setString(5, transaction.getComment());
-            ps.setString(6, transaction.getLocation());
-            ps.setInt(7, transaction.getTypeId());
+            ps.setInt(6, transaction.getPlaceId());
+            ps.setInt(7, transaction.getBeneficiaryId());
+            ps.setInt(8, transaction.getTypeId());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -34,7 +35,8 @@ public class TransactionDAO {
     }
 
     public boolean updateTransaction(Transaction transaction) {
-        String query = "UPDATE transactions SET amount = ?, date = ?, category_id = ?, payment_type_id = ?, comment = ?, location = ?, type_id = ? WHERE id = ?";
+        String query = "UPDATE transactions SET amount = ?, date = ?, category_id = ?, payment_type_id = ?, comment = ?, place_id = ?, beneficiary_id = ?, type_id = ? WHERE id = ?";
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
@@ -43,9 +45,10 @@ public class TransactionDAO {
             stmt.setInt(3, transaction.getCategoryId());
             stmt.setInt(4, transaction.getPaymentTypeId());
             stmt.setString(5, transaction.getComment());
-            stmt.setString(6, transaction.getLocation());
-            stmt.setInt(7, transaction.getTypeId());
-            stmt.setInt(8, transaction.getId());
+            stmt.setInt(6, transaction.getPlaceId());
+            stmt.setInt(7, transaction.getBeneficiaryId());
+            stmt.setInt(8, transaction.getTypeId());
+            stmt.setInt(9, transaction.getId());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -69,10 +72,14 @@ public class TransactionDAO {
 
     public List<Transaction> getAllTransactions() {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT t.id, t.amount, t.date, c.name AS categoryName, p.name AS paymentType, t.comment, t.location " +
-                "FROM Transactions t " +
-                "JOIN Categories c ON t.category_id = c.id " +
-                "JOIN PaymentTypes p ON t.payment_type_id = p.id";
+        String sql = "SELECT t.id, t.amount, t.date, c.name AS categoryName,\n" +
+                "       p.name AS paymentType, t.comment,\n" +
+                "       pl.name AS placeName, b.name AS beneficiaryName\n" +
+                "FROM Transactions t\n" +
+                "JOIN Categories c ON t.category_id = c.id\n" +
+                "JOIN PaymentTypes p ON t.payment_type_id = p.id\n" +
+                "LEFT JOIN Places pl ON t.place_id = pl.id\n" +
+                "LEFT JOIN Beneficiaries b ON t.beneficiary_id = b.id";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -83,11 +90,12 @@ public class TransactionDAO {
                 String categoryName = rs.getString("categoryName");
                 String paymentType = rs.getString("paymentType");
                 String comment = rs.getString("comment");
-                String location = rs.getString("location");
+                String placeName = rs.getString("placeName");
+                String beneficiaryName = rs.getString("beneficiaryName");
 
-                System.out.println("Transaction: " + id + ", " + amount + ", " + date + ", " + categoryName + ", " + paymentType + ", " + comment);
+                transactions.add(new Transaction(id, amount, date, categoryName, paymentType, comment, placeName, beneficiaryName));
 
-                transactions.add(new Transaction(id, amount, date, categoryName, paymentType, comment, location));
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -99,11 +107,14 @@ public class TransactionDAO {
     public List<Transaction> getTransactionsByType(int typeId) {
         List<Transaction> transactions = new ArrayList<>();
 
-        String sql = "SELECT t.id, t.amount, t.date, c.name AS categoryName, p.name AS paymentType, " +
-                "t.comment, t.location, t.type_id " +
+        String sql = "SELECT t.id, t.amount, t.date, c.name AS categoryName, " +
+                "p.name AS paymentType, t.comment, " +
+                "pl.name AS placeName, b.name AS beneficiaryName " +
                 "FROM Transactions t " +
                 "JOIN Categories c ON t.category_id = c.id " +
                 "JOIN PaymentTypes p ON t.payment_type_id = p.id " +
+                "LEFT JOIN Places pl ON t.place_id = pl.id " +
+                "LEFT JOIN Beneficiaries b ON t.beneficiary_id = b.id " +
                 "WHERE t.type_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -111,18 +122,19 @@ public class TransactionDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
+                int id = rs.getInt("id");
+                double amount = rs.getDouble("amount");
+                String date = rs.getString("date");
+                String categoryName = rs.getString("categoryName");
+                String paymentType = rs.getString("paymentType");
+                String comment = rs.getString("comment");
+                String placeName = rs.getString("placeName");
+                String beneficiaryName = rs.getString("beneficiaryName");
+
                 Transaction transaction = new Transaction(
-                        rs.getDouble("amount"),
-                        rs.getString("date"),
-                        -1,
-                        -1,
-                        rs.getString("comment"),
-                        rs.getString("location"),
-                        rs.getInt("type_id")
+                        id, amount, date, categoryName, paymentType, comment, placeName, beneficiaryName
                 );
-                transaction.setId(rs.getInt("id"));
-                transaction.setCategoryName(rs.getString("categoryName"));
-                transaction.setPaymentType(rs.getString("paymentType"));
+                transaction.setTypeId(typeId); // if needed
                 transactions.add(transaction);
             }
         } catch (SQLException e) {
@@ -131,6 +143,7 @@ public class TransactionDAO {
 
         return transactions;
     }
+
 
     public List<String> getAllPaymentTypes() {
         List<String> types = new ArrayList<>();
@@ -166,6 +179,29 @@ public class TransactionDAO {
         return categories;
     }
 
+    public boolean addPlace(String name) {
+        String sql = "INSERT INTO Places (name) VALUES (?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean addBeneficiary(String name) {
+        String sql = "INSERT INTO Beneficiaries (name) VALUES (?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
     public int getCategoryIdByName(String categoryName) {
         String sql = "SELECT id FROM Categories WHERE name = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -193,6 +229,55 @@ public class TransactionDAO {
         }
         return -1;
     }
+
+    public int getPlaceIdByName(String placeName) {
+        String sql = "SELECT id FROM Places WHERE name = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, placeName);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) return rs.getInt("id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public int getBeneficiaryIdByName(String beneficiaryName) {
+        String sql = "SELECT id FROM Beneficiaries WHERE name = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, beneficiaryName);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) return rs.getInt("id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public List<String> getAllPlaces() {
+        List<String> places = new ArrayList<>();
+        String sql = "SELECT name FROM Places";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) places.add(rs.getString("name"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return places;
+    }
+
+    public List<String> getAllBeneficiaries() {
+        List<String> beneficiaries = new ArrayList<>();
+        String sql = "SELECT name FROM Beneficiaries";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) beneficiaries.add(rs.getString("name"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return beneficiaries;
+    }
+
 
     public List<PaymentType> getAllPaymentTypeObjects() {
         List<PaymentType> paymentTypes = new ArrayList<>();
