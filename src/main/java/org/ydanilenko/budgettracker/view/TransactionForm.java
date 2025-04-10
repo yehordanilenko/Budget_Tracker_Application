@@ -62,6 +62,9 @@ public class TransactionForm {
                         .findFirst().orElse(null)
         );
         List<String> places = transactionDAO.getAllPlaces();
+        placeField.setEditable(true);
+        beneficiaryField.setEditable(true);
+
         placeField.setItems(FXCollections.observableArrayList(places));
         placeField.setValue(editingTransaction.getPlaceName());
 
@@ -79,8 +82,34 @@ public class TransactionForm {
                 int categoryId = dao.getCategoryIdByName(categoryField.getValue());
                 int paymentTypeId = paymentTypeField.getValue() != null ? paymentTypeField.getValue().getId() : -1;
                 String comment = commentField.getText();
-                int placeId = dao.getPlaceIdByName(placeField.getValue());
-                int beneficiaryId = dao.getBeneficiaryIdByName(beneficiaryField.getValue());
+
+
+                String placeName = placeField.getEditor().getText().trim();
+                String beneficiaryName = beneficiaryField.getEditor().getText().trim();
+
+                if (placeName.isEmpty() || beneficiaryName.isEmpty()) {
+                    showError("Place and Beneficiary are required.");
+                    return;
+                }
+
+                if (!transactionDAO.getAllPlaces().contains(placeName)) {
+                    transactionDAO.addPlace(placeName);
+                    placeField.setItems(FXCollections.observableArrayList(transactionDAO.getAllPlaces()));
+                }
+                placeField.setValue(placeName);
+                int placeId = dao.getPlaceIdByName(placeName);
+
+//                int placeId = transactionDAO.getPlaceIdByName(placeName);
+
+                if (!transactionDAO.getAllBeneficiaries().contains(beneficiaryName)) {
+                    transactionDAO.addBeneficiary(beneficiaryName);
+                    beneficiaryField.setItems(FXCollections.observableArrayList(transactionDAO.getAllBeneficiaries()));
+                }
+                beneficiaryField.setValue(beneficiaryName);
+                int beneficiaryId = dao.getBeneficiaryIdByName(beneficiaryName);
+
+//                int beneficiaryId = transactionDAO.getBeneficiaryIdByName(beneficiaryName);
+                //int beneficiaryId = dao.getBeneficiaryIdByName(beneficiaryName);
 
                 Transaction updatedTransaction = new Transaction(editingTransaction.getId(), amount, date, categoryId, paymentTypeId, comment, typeId);
                 updatedTransaction.setPlaceId(placeId);
@@ -182,6 +211,9 @@ public class TransactionForm {
         TextField commentField = new TextField(copiedTransaction.getComment());
         ComboBox<String> placeField = new ComboBox<>(FXCollections.observableArrayList(dao.getAllPlaces()));
         ComboBox<String> beneficiaryField = new ComboBox<>(FXCollections.observableArrayList(dao.getAllBeneficiaries()));
+        placeField.setEditable(true);
+        beneficiaryField.setEditable(true);
+
         placeField.setValue(copiedTransaction.getPlaceName());
         beneficiaryField.setValue(copiedTransaction.getBeneficiaryName());
 
@@ -193,8 +225,31 @@ public class TransactionForm {
                 int categoryId = dao.getCategoryIdByName(categoryField.getValue());
                 int paymentTypeId = paymentTypeField.getValue() != null ? paymentTypeField.getValue().getId() : -1;
                 String comment = commentField.getText();
-                int placeId = dao.getPlaceIdByName(placeField.getValue());
-                int beneficiaryId = dao.getBeneficiaryIdByName(beneficiaryField.getValue());
+               // int placeId = dao.getPlaceIdByName(placeField.getValue());
+                // int beneficiaryId = dao.getBeneficiaryIdByName(beneficiaryField.getValue());
+                String placeName = placeField.getEditor().getText().trim();
+                String beneficiaryName = beneficiaryField.getEditor().getText().trim();
+
+                if (placeName.isEmpty() || beneficiaryName.isEmpty()) {
+                    showError("Place and Beneficiary are required.");
+                    return;
+                }
+
+                if (!transactionDAO.getAllPlaces().contains(placeName)) {
+                    transactionDAO.addPlace(placeName);
+                    placeField.setItems(FXCollections.observableArrayList(transactionDAO.getAllPlaces()));
+                }
+                placeField.setValue(placeName);
+                int placeId = transactionDAO.getPlaceIdByName(placeName);
+
+
+                if (!transactionDAO.getAllBeneficiaries().contains(beneficiaryName)) {
+                    transactionDAO.addBeneficiary(beneficiaryName);
+                    beneficiaryField.setItems(FXCollections.observableArrayList(transactionDAO.getAllBeneficiaries()));
+                }
+                beneficiaryField.setValue(beneficiaryName);
+                int beneficiaryId = transactionDAO.getBeneficiaryIdByName(beneficiaryName);
+
 
                 Transaction tx = new Transaction(amount, date, categoryId, paymentTypeId, comment, placeId, beneficiaryId, typeId);
 
@@ -264,6 +319,9 @@ public class TransactionForm {
         TextField commentField = new TextField();
         ComboBox<String> placeField = new ComboBox<>(FXCollections.observableArrayList(transactionDAO.getAllPlaces()));
         ComboBox<String> beneficiaryField = new ComboBox<>(FXCollections.observableArrayList(transactionDAO.getAllBeneficiaries()));
+        placeField.setEditable(true);
+        beneficiaryField.setEditable(true);
+
         placeField.setPromptText("Select Place");
         beneficiaryField.setPromptText("Select Beneficiary");
 
@@ -275,8 +333,31 @@ public class TransactionForm {
                 int categoryId = transactionDAO.getCategoryIdByName(categoryField.getValue());
                 int paymentTypeId = paymentTypeField.getValue() != null ? paymentTypeField.getValue().getId() : -1;
                 String comment = commentField.getText();
-                int placeId = transactionDAO.getPlaceIdByName(placeField.getValue());
-                int beneficiaryId = transactionDAO.getBeneficiaryIdByName(beneficiaryField.getValue());
+                //int placeId = transactionDAO.getPlaceIdByName(placeField.getValue());
+                //int beneficiaryId = transactionDAO.getBeneficiaryIdByName(beneficiaryField.getValue());
+                String placeName = placeField.getEditor().getText().trim();
+                String beneficiaryName = beneficiaryField.getEditor().getText().trim();
+
+                if (placeName.isEmpty() || beneficiaryName.isEmpty()) {
+                    showError("Place and Beneficiary are required.");
+                    return;
+                }
+
+                if (!transactionDAO.getAllPlaces().contains(placeName)) {
+                    transactionDAO.addPlace(placeName);
+                    placeField.setItems(FXCollections.observableArrayList(transactionDAO.getAllPlaces()));
+                }
+                placeField.setValue(placeName);
+                int placeId = transactionDAO.getPlaceIdByName(placeName);
+
+
+                if (!transactionDAO.getAllBeneficiaries().contains(beneficiaryName)) {
+                    transactionDAO.addBeneficiary(beneficiaryName);
+                    beneficiaryField.setItems(FXCollections.observableArrayList(transactionDAO.getAllBeneficiaries()));
+                }
+                beneficiaryField.setValue(beneficiaryName);
+                int beneficiaryId = transactionDAO.getBeneficiaryIdByName(beneficiaryName);
+
 
                 Transaction tx = new Transaction(amount, date, categoryId, paymentTypeId, comment, placeId, beneficiaryId, typeId);
 

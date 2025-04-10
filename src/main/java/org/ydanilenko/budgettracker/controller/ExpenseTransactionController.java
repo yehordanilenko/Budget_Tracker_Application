@@ -206,7 +206,6 @@ public class ExpenseTransactionController {
         table.setContextMenu(contextMenu);
     }
 
-
     public void initialize() {
         updateTransactionList();
     }
