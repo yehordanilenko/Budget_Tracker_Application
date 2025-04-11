@@ -40,8 +40,12 @@ public class PaymentTypeManager {
         deleteButton.setOnAction(e -> {
             PaymentType selected = table.getSelectionModel().getSelectedItem();
             if (selected != null && confirmDelete()) {
-                dao.deletePaymentType(selected.getId());
-                loadData();
+                boolean success = dao.deletePaymentType(selected.getId());
+                if (success) {
+                    loadData();
+                } else {
+                    showError("This payment method is associated with existing transactions and cannot be deleted.");
+                }
             }
         });
 

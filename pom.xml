@@ -20,6 +20,12 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.42.0.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
+        </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -31,6 +37,14 @@
             <version>20.0.2</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+    </repositories>
+
 
     <build>
         <plugins>
