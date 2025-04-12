@@ -4,6 +4,7 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
@@ -99,8 +100,22 @@ public class IncomeTransactionView {
         updateCharts(transactions);
 
         double total = transactions.stream().mapToDouble(Transaction::getAmount).sum();
-        totalLabel.setText(String.format("Total Income: %.2f", total));
-        totalLabel.setStyle("-fx-text-fill: green; -fx-font-size: 16px; -fx-font-weight: bold;");
+        totalLabel.setText(String.format("💰 Total Income: %.2f", total));
+        totalLabel.setStyle("""
+    -fx-background-color: #e6ffe6;
+    -fx-text-fill: green;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 8px;
+""");
+
+        if (transactions.isEmpty()) {
+            table.setPlaceholder(new Label("No income to show in this range."));
+        } else {
+            table.setPlaceholder(new Label(""));
+        }
+
     }
 
 
@@ -170,7 +185,18 @@ public class IncomeTransactionView {
 
         HBox bottomControls = new HBox(10, addButton, managePaymentTypesButton, spacer_for_total, totalLabel);
         bottomControls.setPadding(new Insets(10));
-        layout.setBottom(bottomControls);
+        HBox leftControls = new HBox(10, addButton, managePaymentTypesButton);
+        HBox rightTotal = new HBox(totalLabel);
+        rightTotal.setAlignment(Pos.CENTER_RIGHT);
+        HBox.setHgrow(rightTotal, Priority.ALWAYS);
+
+        BorderPane bottomPane = new BorderPane();
+        bottomPane.setLeft(leftControls);
+        bottomPane.setRight(rightTotal);
+        bottomPane.setPadding(new Insets(10));
+
+        layout.setBottom(bottomPane);
+
 
         VBox pieAndFilterBox = new VBox(20, chartButtonBox, filterRow, dateRow);
         VBox mainCenter = new VBox(10, table, pieAndFilterBox);
@@ -179,6 +205,7 @@ public class IncomeTransactionView {
 
 
         Scene scene = new Scene(layout, 1000, 700);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Budget Tracker");
         stage.show();

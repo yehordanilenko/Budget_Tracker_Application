@@ -56,6 +56,7 @@ public class PaymentTypeManager {
         layout.setPadding(new Insets(10));
 
         Scene scene = new Scene(layout, 600, 400);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         setupContextMenu();
         window.setScene(scene);
 

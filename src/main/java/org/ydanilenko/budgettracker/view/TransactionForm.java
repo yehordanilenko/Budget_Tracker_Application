@@ -169,6 +169,7 @@ public class TransactionForm {
         form.add(deleteButton, 1, 8);
 
         Scene scene = new Scene(form);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         popupStage.setScene(scene);
         popupStage.setTitle("Edit Transaction");
         popupStage.show();
@@ -287,6 +288,7 @@ public class TransactionForm {
         form.add(saveButton, 1, 7);
 
         Scene scene = new Scene(form, 400, 350);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         popupStage.setScene(scene);
         popupStage.showAndWait();
     }
@@ -395,6 +397,7 @@ public class TransactionForm {
         form.add(saveButton, 1, 7);
 
         Scene scene = new Scene(form, 400, 350);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         popupStage.setScene(scene);
         popupStage.showAndWait();
     }

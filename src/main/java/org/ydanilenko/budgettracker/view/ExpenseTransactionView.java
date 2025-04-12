@@ -3,6 +3,7 @@ package org.ydanilenko.budgettracker.view;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
@@ -147,9 +148,23 @@ public class ExpenseTransactionView {
         table.setItems(data);
         updatePieChart(transactions);
 
+        if (transactions.isEmpty()) {
+            table.setPlaceholder(new Label("No expenses to show in this range."));
+        } else {
+            table.setPlaceholder(new Label("")); // clears any previous message
+        }
+
         double total = transactions.stream().mapToDouble(Transaction::getAmount).sum();
-        totalLabel.setText(String.format("Total Expenses: %.2f", total));
-        totalLabel.setStyle("-fx-text-fill: red; -fx-font-size: 16px; -fx-font-weight: bold;");
+        totalLabel.setText(String.format("💸 Total Expenses: %.2f", total));
+        totalLabel.setStyle("""
+    -fx-background-color: #ffe5e5;
+    -fx-text-fill: red;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 8px;
+""");
+
     }
 
 
@@ -203,6 +218,12 @@ public class ExpenseTransactionView {
         VBox mainCenter = new VBox(10, table, pieAndFilterBox);
         layout.setCenter(mainCenter);
 
+        startDatePicker.getEditor().setDisable(true);
+        startDatePicker.getEditor().setOpacity(1);
+
+        endDatePicker.getEditor().setDisable(true);
+        endDatePicker.getEditor().setOpacity(1);
+
         managePaymentTypesButton.setOnAction(e -> {
             new PaymentTypeManager(stage, new TransactionDAO(DatabaseConnection.getConnection()), this, null).show();
         });
@@ -213,11 +234,23 @@ public class ExpenseTransactionView {
 
         HBox bottomControls = new HBox(10, addButton, managePaymentTypesButton, spacer_for_total, totalLabel);
         bottomControls.setPadding(new Insets(10));
-        layout.setBottom(bottomControls);
+        HBox leftControls = new HBox(10, addButton, managePaymentTypesButton);
+        HBox rightTotal = new HBox(totalLabel);
+        rightTotal.setAlignment(Pos.CENTER_RIGHT);
+        HBox.setHgrow(rightTotal, Priority.ALWAYS);
+
+        BorderPane bottomPane = new BorderPane();
+        bottomPane.setLeft(leftControls);
+        bottomPane.setRight(rightTotal);
+        bottomPane.setPadding(new Insets(10));
+
+        layout.setBottom(bottomPane);
+
 
 
 
         Scene scene = new Scene(layout, 1000, 700);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         stage.setScene(scene);
         stage.setTitle("Budget Tracker");
         stage.show();
