@@ -278,7 +278,6 @@ public class TransactionDAO {
         return beneficiaries;
     }
 
-
     public List<PaymentType> getAllPaymentTypeObjects() {
         List<PaymentType> paymentTypes = new ArrayList<>();
         String sql = "SELECT id, name, bank, issuer, issue_date, expiration_date FROM PaymentTypes";
@@ -344,7 +343,8 @@ public class TransactionDAO {
             stmt.setInt(1, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.err.println("Attempted to delete payment type in use: " + e.getMessage());
             return false;
         }
     }

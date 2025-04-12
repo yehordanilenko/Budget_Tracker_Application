@@ -4,21 +4,22 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.beans.binding.Bindings;
 
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
 import org.ydanilenko.budgettracker.util.DatabaseConnection;
 import org.ydanilenko.budgettracker.view.PaymentTypeManager;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class ExpenseTransactionView {
     private final TableView<Transaction> table;
@@ -34,6 +35,8 @@ public class ExpenseTransactionView {
     private final Button showCategoryChartButton = new Button("Spending by Category");
     private final Button showPaymentChartButton = new Button("Spending by Payment Type");
     private final Button managePaymentTypesButton = new Button("Manage Payment Types");
+    private final Label totalLabel = new Label("Total: 0.00");
+    private final Button showHistogramButton = new Button("Income vs Expense Chart");
 
     public ExpenseTransactionView(Stage stage) {
         this.stage = stage;
@@ -143,7 +146,12 @@ public class ExpenseTransactionView {
         ObservableList<Transaction> data = FXCollections.observableArrayList(transactions);
         table.setItems(data);
         updatePieChart(transactions);
+
+        double total = transactions.stream().mapToDouble(Transaction::getAmount).sum();
+        totalLabel.setText(String.format("Total Expenses: %.2f", total));
+        totalLabel.setStyle("-fx-text-fill: red; -fx-font-size: 16px; -fx-font-weight: bold;");
     }
+
 
     public VBox createDateRangeFilter() {
         VBox dateFilterBox = new VBox(10);
@@ -180,7 +188,8 @@ public class ExpenseTransactionView {
         header.getChildren().addAll(title, spacer, switchToIncomeButton);
         layout.setTop(header);
 
-        HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton);
+//        HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton);
+        HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton, showHistogramButton);
 
         HBox filterRow = new HBox(10, filterButton, resetFilterButton);
 
@@ -197,9 +206,15 @@ public class ExpenseTransactionView {
         managePaymentTypesButton.setOnAction(e -> {
             new PaymentTypeManager(stage, new TransactionDAO(DatabaseConnection.getConnection()), this, null).show();
         });
+        showHistogramButton.setOnAction(e -> showIncomeExpenseHistogram());
 
-        HBox bottomControls = new HBox(10, addButton, managePaymentTypesButton);
+        Region spacer_for_total = new Region();
+        HBox.setHgrow(spacer_for_total, Priority.ALWAYS);
+
+        HBox bottomControls = new HBox(10, addButton, managePaymentTypesButton, spacer_for_total, totalLabel);
+        bottomControls.setPadding(new Insets(10));
         layout.setBottom(bottomControls);
+
 
 
         Scene scene = new Scene(layout, 1000, 700);
@@ -224,6 +239,73 @@ public class ExpenseTransactionView {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private void showIncomeExpenseHistogram() {
+        TransactionDAO dao = new TransactionDAO(DatabaseConnection.getConnection());
+
+        List<Transaction> expenses = dao.getTransactionsByType(0); // 0 = Expense
+        List<Transaction> incomes = dao.getTransactionsByType(1);  // 1 = Income
+
+        LocalDate start = startDatePicker.getValue();
+        LocalDate end = endDatePicker.getValue();
+
+        if (start != null && end != null) {
+            expenses = expenses.stream()
+                    .filter(t -> !LocalDate.parse(t.getDate()).isBefore(start) && !LocalDate.parse(t.getDate()).isAfter(end))
+                    .toList();
+            incomes = incomes.stream()
+                    .filter(t -> !LocalDate.parse(t.getDate()).isBefore(start) && !LocalDate.parse(t.getDate()).isAfter(end))
+                    .toList();
+        }
+
+        Map<String, Double> incomeMap = new TreeMap<>();
+        Map<String, Double> expenseMap = new TreeMap<>();
+
+        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy-MM");
+
+        for (Transaction t : incomes) {
+            String month = LocalDate.parse(t.getDate()).format(monthFormatter);
+            incomeMap.merge(month, t.getAmount(), Double::sum);
+        }
+
+        for (Transaction t : expenses) {
+            String month = LocalDate.parse(t.getDate()).format(monthFormatter);
+            expenseMap.merge(month, t.getAmount(), Double::sum);
+        }
+
+
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle("Income vs Expense");
+        xAxis.setLabel("Date");
+        yAxis.setLabel("Amount");
+
+        XYChart.Series<String, Number> incomeSeries = new XYChart.Series<>();
+        incomeSeries.setName("Income");
+
+        XYChart.Series<String, Number> expenseSeries = new XYChart.Series<>();
+        expenseSeries.setName("Expense");
+
+        Set<String> allDates = new TreeSet<>();
+        allDates.addAll(incomeMap.keySet());
+        allDates.addAll(expenseMap.keySet());
+
+        for (String date : allDates) {
+            incomeSeries.getData().add(new XYChart.Data<>(date, incomeMap.getOrDefault(date, 0.0)));
+            expenseSeries.getData().add(new XYChart.Data<>(date, expenseMap.getOrDefault(date, 0.0)));
+        }
+
+        barChart.getData().addAll(incomeSeries, expenseSeries);
+
+        Stage chartStage = new Stage();
+        chartStage.initModality(Modality.APPLICATION_MODAL);
+        chartStage.initOwner(stage);
+        chartStage.setTitle("Income vs Expense Histogram");
+        chartStage.setScene(new Scene(barChart, 800, 600));
+        chartStage.showAndWait();
+
     }
 
     public void showSuccess(String message) {
