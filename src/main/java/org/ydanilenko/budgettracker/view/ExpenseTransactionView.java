@@ -157,14 +157,13 @@ public class ExpenseTransactionView {
         double total = transactions.stream().mapToDouble(Transaction::getAmount).sum();
         totalLabel.setText(String.format("💸 Total Expenses: %.2f", total));
         totalLabel.setStyle("""
-    -fx-background-color: #ffe5e5;
-    -fx-text-fill: red;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-padding: 8px 12px;
-    -fx-background-radius: 8px;
-""");
-
+            -fx-background-color: #ffe5e5;
+            -fx-text-fill: red;
+            -fx-font-size: 16px;
+            -fx-font-weight: bold;
+            -fx-padding: 8px 12px;
+            -fx-background-radius: 8px;
+        """);
     }
 
 
@@ -203,7 +202,6 @@ public class ExpenseTransactionView {
         header.getChildren().addAll(title, spacer, switchToIncomeButton);
         layout.setTop(header);
 
-//        HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton);
         HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton, showHistogramButton);
 
         HBox filterRow = new HBox(10, filterButton, resetFilterButton);

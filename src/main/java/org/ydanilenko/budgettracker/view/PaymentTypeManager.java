@@ -175,7 +175,9 @@ public class PaymentTypeManager {
         form.add(issueRow, 1, 3);
         form.add(expRow, 1, 4);
 
-        Scene scene = new Scene(form);
+        Scene scene = new Scene(form);scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+        formStage.setWidth(400);  // Wider
+        formStage.setHeight(330); // Taller
         formStage.setScene(scene);
         formStage.showAndWait();
     }
@@ -195,7 +197,6 @@ public class PaymentTypeManager {
         copyItem.setOnAction(e -> {
             PaymentType selected = table.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                // Create a new instance with the same data but no ID
                 PaymentType copied = new PaymentType(
                         0,
                         selected.getName(),
@@ -204,7 +205,7 @@ public class PaymentTypeManager {
                         selected.getIssueDate(),
                         selected.getExpirationDate()
                 );
-                showForm(copied); // Show form prefilled, treated as a new entry
+                showForm(copied);
             }
         });
 
@@ -228,12 +229,24 @@ public class PaymentTypeManager {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirm Deletion");
         alert.setHeaderText("Are you sure you want to delete this payment type?");
+        alert.setContentText("This action cannot be undone.");
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+        dialogPane.getStyleClass().add("custom-confirm");
         return alert.showAndWait().filter(btn -> btn == ButtonType.OK).isPresent();
     }
 
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error");
         alert.setContentText(msg);
+
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+        dialogPane.getStyleClass().add("custom-alert");
+
         alert.showAndWait();
     }
 

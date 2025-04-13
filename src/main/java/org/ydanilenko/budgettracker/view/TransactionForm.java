@@ -133,6 +133,10 @@ public class TransactionForm {
             confirmation.setTitle("Confirm Deletion");
             confirmation.setHeaderText("Are you sure you want to delete this transaction?");
             confirmation.setContentText("This action cannot be undone.");
+
+            DialogPane dialogPane = confirmation.getDialogPane();
+            dialogPane.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+            dialogPane.getStyleClass().add("custom-confirm");
             confirmation.showAndWait().ifPresent(result -> {
                 if (result == ButtonType.OK) {
                     boolean success = dao.deleteTransaction(editingTransaction.getId());
