@@ -71,8 +71,8 @@ public class TransactionForm {
                 if (!beneficiaryField.getItems().contains(suggested)) {
                     beneficiaryField.getItems().add(suggested);
                 }
-                beneficiaryField.setValue(suggested); // selects from dropdown
-                beneficiaryField.getEditor().setText(suggested); // shows in text box
+                beneficiaryField.setValue(suggested);
+                beneficiaryField.getEditor().setText(suggested);
             }
         });
 
@@ -122,8 +122,6 @@ public class TransactionForm {
                 placeField.setValue(placeName);
                 int placeId = dao.getPlaceIdByName(placeName);
 
-//                int placeId = transactionDAO.getPlaceIdByName(placeName);
-
                 if (!transactionDAO.getAllBeneficiaries().contains(beneficiaryName)) {
                     transactionDAO.addBeneficiary(beneficiaryName);
                     beneficiaryField.setItems(FXCollections.observableArrayList(transactionDAO.getAllBeneficiaries()));
@@ -170,27 +168,10 @@ public class TransactionForm {
             });
         });
 
-        GridPane form = new GridPane();
-        form.setPadding(new Insets(10));
-        form.setHgap(10);
-        form.setVgap(10);
-
-        form.add(new Label("Amount:"), 0, 0);
-        form.add(amountField, 1, 0);
-        form.add(new Label("Date:"), 0, 1);
-        form.add(dateField, 1, 1);
-        form.add(new Label("Category:"), 0, 2);
-        form.add(categoryField, 1, 2);
-        form.add(new Label("Payment Type:"), 0, 3);
-        form.add(paymentTypeField, 1, 3);
-        form.add(new Label("Comment:"), 0, 4);
-        form.add(commentField, 1, 4);
-        form.add(new Label("Place:"), 0, 5);
-        form.add(placeField, 1, 5);
-        form.add(new Label("Beneficiary:"), 0, 6);
-        form.add(beneficiaryField, 1, 6);
-        form.add(saveButton, 1, 7);
-        form.add(deleteButton, 1, 8);
+        GridPane form = createTransactionForm(amountField, dateField, categoryField,
+                paymentTypeField, commentField,
+                placeField, beneficiaryField,
+                saveButton, deleteButton);
 
         Scene scene = new Scene(form);
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
@@ -244,8 +225,8 @@ public class TransactionForm {
                 if (!beneficiaryField.getItems().contains(suggested)) {
                     beneficiaryField.getItems().add(suggested);
                 }
-                beneficiaryField.setValue(suggested); // selects from dropdown
-                beneficiaryField.getEditor().setText(suggested); // shows in text box
+                beneficiaryField.setValue(suggested);
+                beneficiaryField.getEditor().setText(suggested);
             }
         });
         placeField.setValue(copiedTransaction.getPlaceName());
@@ -308,26 +289,10 @@ public class TransactionForm {
             }
         });
 
-        GridPane form = new GridPane();
-        form.setPadding(new Insets(10));
-        form.setHgap(10);
-        form.setVgap(10);
-
-        form.add(new Label("Amount:"), 0, 0);
-        form.add(amountField, 1, 0);
-        form.add(new Label("Date:"), 0, 1);
-        form.add(dateField, 1, 1);
-        form.add(new Label("Category:"), 0, 2);
-        form.add(categoryField, 1, 2);
-        form.add(new Label("Payment Type:"), 0, 3);
-        form.add(paymentTypeField, 1, 3);
-        form.add(new Label("Comment:"), 0, 4);
-        form.add(commentField, 1, 4);
-        form.add(new Label("Place:"), 0, 5);
-        form.add(placeField, 1, 5);
-        form.add(new Label("Beneficiary:"), 0, 6);
-        form.add(beneficiaryField, 1, 6);
-        form.add(saveButton, 1, 7);
+        GridPane form = createTransactionForm(amountField, dateField, categoryField,
+                paymentTypeField, commentField,
+                placeField, beneficiaryField,
+                saveButton, null);
 
         Scene scene = new Scene(form, 400, 350);
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
@@ -376,8 +341,8 @@ public class TransactionForm {
                 if (!beneficiaryField.getItems().contains(suggested)) {
                     beneficiaryField.getItems().add(suggested);
                 }
-                beneficiaryField.setValue(suggested); // selects from dropdown
-                beneficiaryField.getEditor().setText(suggested); // shows in text box
+                beneficiaryField.setValue(suggested);
+                beneficiaryField.getEditor().setText(suggested);
             }
         });
         Button saveButton = new Button("Add Transaction");
@@ -436,6 +401,21 @@ public class TransactionForm {
             }
         });
 
+        GridPane form = createTransactionForm(amountField, dateField, categoryField,
+                paymentTypeField, commentField,
+                placeField, beneficiaryField,
+                saveButton, null);
+
+        Scene scene = new Scene(form, 400, 350);
+        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+        popupStage.setScene(scene);
+        popupStage.showAndWait();
+    }
+
+    private GridPane createTransactionForm(TextField amountField, DatePicker dateField, ComboBox<String> categoryField,
+                                           ComboBox<PaymentType> paymentTypeField, TextField commentField,
+                                           ComboBox<String> placeField, ComboBox<String> beneficiaryField,
+                                           Button saveButton, Button deleteButton) {
         GridPane form = new GridPane();
         form.setPadding(new Insets(10));
         form.setHgap(10);
@@ -457,10 +437,11 @@ public class TransactionForm {
         form.add(beneficiaryField, 1, 6);
         form.add(saveButton, 1, 7);
 
-        Scene scene = new Scene(form, 400, 350);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        popupStage.setScene(scene);
-        popupStage.showAndWait();
+        if (deleteButton != null) {
+            form.add(deleteButton, 1, 8);
+        }
+
+        return form;
     }
 
 

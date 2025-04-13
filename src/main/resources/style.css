@@ -1,0 +1,120 @@
+
+.root {
+    -fx-background-color: #e9eef6;
+}
+
+.label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #333;
+}
+
+.button {
+    -fx-background-color: #3f51b5;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 6 14;
+}
+
+.button:hover {
+    -fx-background-color: #303f9f;
+}
+
+.date-picker, .combo-box, .text-field {
+    -fx-background-radius: 6px;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 6px;
+    -fx-padding: 4px;
+}
+
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 8px;
+    -fx-padding: 10px;
+}
+
+.table-view .column-header {
+    -fx-background-color: #e0e0e0;
+    -fx-font-weight: bold;
+}
+
+.table-column {
+    -fx-alignment: CENTER-LEFT;
+}
+
+.total-label-expense {
+    -fx-background-color: #ffe5e5;
+    -fx-text-fill: red;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 14px;
+    -fx-background-radius: 10px;
+}
+
+.total-label-income {
+    -fx-background-color: #e6ffe6;
+    -fx-text-fill: green;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 14px;
+    -fx-background-radius: 10px;
+}
+
+.custom-alert {
+    -fx-background-color: #fff0f0;
+    -fx-border-color: #f44336;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 10;
+}
+
+.custom-alert .header-panel {
+    -fx-background-color: transparent;
+    -fx-font-size: 14px;
+    -fx-text-fill: #d32f2f;
+}
+
+.custom-alert .content {
+    -fx-text-fill: #b71c1c;
+    -fx-font-size: 13px;
+}
+
+.custom-alert .button-bar .button {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+    -fx-background-radius: 5px;
+}
+
+.custom-alert .button-bar .button:hover {
+    -fx-background-color: #d32f2f;
+}
+
+.custom-confirm {
+    -fx-background-color: #f0f4ff;
+    -fx-border-color: #2196f3;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 10;
+}
+
+.custom-confirm .header-panel {
+    -fx-background-color: transparent;
+    -fx-font-size: 14px;
+    -fx-text-fill: #0d47a1;
+}
+
+.custom-confirm .content {
+    -fx-text-fill: #0d47a1;
+    -fx-font-size: 13px;
+}
+
+.custom-confirm .button-bar .button {
+    -fx-background-color: #2196f3;
+    -fx-text-fill: white;
+    -fx-background-radius: 5px;
+}
+
+.custom-confirm .button-bar .button:hover {
+    -fx-background-color: #1976d2;
+}

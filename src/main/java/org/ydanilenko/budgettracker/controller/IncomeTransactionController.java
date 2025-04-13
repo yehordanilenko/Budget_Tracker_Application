@@ -183,7 +183,7 @@ public class IncomeTransactionController {
                         transactionDAO,
                         this::updateTransactionList,
                         selected
-                ).show(incomeView.getStage(), this::updateTransactionList);
+                );
             }
         });
 
@@ -197,7 +197,7 @@ public class IncomeTransactionController {
                         1,
                         selected,
                         this::updateTransactionList
-                ).show(incomeView.getStage(), this::updateTransactionList);
+                );
             }
         });
 
