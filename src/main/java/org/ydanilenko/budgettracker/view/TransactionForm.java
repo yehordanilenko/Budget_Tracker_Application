@@ -14,7 +14,6 @@ import org.ydanilenko.budgettracker.model.PaymentType;
 import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
 import org.ydanilenko.budgettracker.util.BeneficiarySuggester;
-import org.ydanilenko.budgettracker.util.CategorySuggester;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -87,22 +86,24 @@ public class TransactionForm {
         categoryField.setValue(editingTransaction.getCategoryName());
 
 
-
-
-        commentField.textProperty().addListener((obs, oldText, newText) -> {
-            String suggested = CategorySuggester.suggestCategory(newText);
-            if (suggested != null) {
-                categoryField.setValue(suggested);
-            }
-        });
-
         Button saveButton = new Button("Update Transaction");
         saveButton.setOnAction(e -> {
             try {
                 double amount = Double.parseDouble(amountField.getText());
                 String date = dateField.getValue().toString();
-                int categoryId = dao.getCategoryIdByName(categoryField.getValue());
-                int paymentTypeId = paymentTypeField.getValue() != null ? paymentTypeField.getValue().getId() : -1;
+                String categoryName = categoryField.getValue();
+                if (categoryName == null) {
+                    showError("Please select a category.");
+                    return;
+                }
+                int categoryId = dao.getCategoryIdByName(categoryName);
+
+                if (paymentTypeField.getValue() == null) {
+                    showError("Please select a payment type.");
+                    return;
+                }
+                int paymentTypeId = paymentTypeField.getValue().getId();
+
                 String comment = commentField.getText();
 
 
@@ -129,9 +130,6 @@ public class TransactionForm {
                 }
                 beneficiaryField.setValue(beneficiaryName);
                 int beneficiaryId = dao.getBeneficiaryIdByName(beneficiaryName);
-
-//                int beneficiaryId = transactionDAO.getBeneficiaryIdByName(beneficiaryName);
-                //int beneficiaryId = dao.getBeneficiaryIdByName(beneficiaryName);
 
                 Transaction updatedTransaction = new Transaction(editingTransaction.getId(), amount, date, categoryId, paymentTypeId, comment, typeId);
                 updatedTransaction.setPlaceId(placeId);
@@ -236,12 +234,6 @@ public class TransactionForm {
         );
 
         TextField commentField = new TextField(copiedTransaction.getComment());
-        commentField.textProperty().addListener((obs, oldText, newText) -> {
-            String suggested = CategorySuggester.suggestCategory(newText);
-            if (suggested != null) {
-                categoryField.setValue(suggested);
-            }
-        });
         ComboBox<String> placeField = new ComboBox<>(FXCollections.observableArrayList(dao.getAllPlaces()));
         ComboBox<String> beneficiaryField = new ComboBox<>(FXCollections.observableArrayList(dao.getAllBeneficiaries()));
         placeField.setEditable(true);
@@ -264,11 +256,20 @@ public class TransactionForm {
             try {
                 double amount = Double.parseDouble(amountField.getText());
                 String date = dateField.getValue().toString();
-                int categoryId = dao.getCategoryIdByName(categoryField.getValue());
-                int paymentTypeId = paymentTypeField.getValue() != null ? paymentTypeField.getValue().getId() : -1;
+                String categoryName = categoryField.getValue();
+                if (categoryName == null) {
+                    showError("Please select a category.");
+                    return;
+                }
+                int categoryId = dao.getCategoryIdByName(categoryName);
+
+                if (paymentTypeField.getValue() == null) {
+                    showError("Please select a payment type.");
+                    return;
+                }
+                int paymentTypeId = paymentTypeField.getValue().getId();
+
                 String comment = commentField.getText();
-               // int placeId = dao.getPlaceIdByName(placeField.getValue());
-                // int beneficiaryId = dao.getBeneficiaryIdByName(beneficiaryField.getValue());
                 String placeName = placeField.getEditor().getText().trim();
                 String beneficiaryName = beneficiaryField.getEditor().getText().trim();
 
@@ -337,7 +338,7 @@ public class TransactionForm {
 
     public void show(Stage parentStage, Runnable onTransactionAdded) {
         Stage popupStage = new Stage();
-        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.initModality(Modality.WINDOW_MODAL);
         popupStage.initOwner(parentStage);
         popupStage.setTitle("Add Transaction");
 
@@ -361,15 +362,6 @@ public class TransactionForm {
         });
 
         TextField commentField = new TextField();
-        commentField.textProperty().addListener((obs, oldText, newText) -> {
-            String suggested = CategorySuggester.suggestCategory(newText);
-            if (suggested != null) {
-                categoryField.setValue(suggested);
-            }
-        });
-
-
-
 
         ComboBox<String> placeField = new ComboBox<>(FXCollections.observableArrayList(transactionDAO.getAllPlaces()));
         ComboBox<String> beneficiaryField = new ComboBox<>(FXCollections.observableArrayList(transactionDAO.getAllBeneficiaries()));
@@ -393,11 +385,19 @@ public class TransactionForm {
             try {
                 double amount = Double.parseDouble(amountField.getText());
                 String date = dateField.getValue().toString();
-                int categoryId = transactionDAO.getCategoryIdByName(categoryField.getValue());
-                int paymentTypeId = paymentTypeField.getValue() != null ? paymentTypeField.getValue().getId() : -1;
+                String categoryName = categoryField.getValue();
+                if (categoryName == null) {
+                    showError("Please select a category.");
+                    return;
+                }
+                int categoryId = transactionDAO.getCategoryIdByName(categoryName);
+
+                if (paymentTypeField.getValue() == null) {
+                    showError("Please select a payment type.");
+                    return;
+                }
+                int paymentTypeId = paymentTypeField.getValue().getId();
                 String comment = commentField.getText();
-                //int placeId = transactionDAO.getPlaceIdByName(placeField.getValue());
-                //int beneficiaryId = transactionDAO.getBeneficiaryIdByName(beneficiaryField.getValue());
                 String placeName = placeField.getEditor().getText().trim();
                 String beneficiaryName = beneficiaryField.getEditor().getText().trim();
 

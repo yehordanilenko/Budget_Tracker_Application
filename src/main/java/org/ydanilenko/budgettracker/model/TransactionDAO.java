@@ -4,7 +4,9 @@ import org.ydanilenko.budgettracker.util.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TransactionDAO {
     private final Connection connection;
@@ -371,6 +373,50 @@ public class TransactionDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public Map<String, String> getKeywordCategoryMapping() {
+        Map<String, Map<String, Integer>> keywordCounts = new HashMap<>();
+
+        String sql = """
+        SELECT c.name AS category, t.comment
+        FROM Transactions t
+        JOIN Categories c ON t.category_id = c.id
+        WHERE t.comment IS NOT NULL
+    """;
+
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                String category = rs.getString("category");
+                String comment = rs.getString("comment");
+                String[] words = comment.toLowerCase().split("\\W+");
+
+                for (String word : words) {
+                    if (word.isBlank()) continue;
+                    keywordCounts
+                            .computeIfAbsent(word, k -> new HashMap<>())
+                            .merge(category, 1, Integer::sum);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        Map<String, String> result = new HashMap<>();
+        for (Map.Entry<String, Map<String, Integer>> entry : keywordCounts.entrySet()) {
+            String keyword = entry.getKey();
+            Map<String, Integer> counts = entry.getValue();
+            String topCategory = counts.entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .orElse(null);
+            if (topCategory != null) {
+                result.put(keyword, topCategory);
+            }
+        }
+
+        return result;
     }
 
 

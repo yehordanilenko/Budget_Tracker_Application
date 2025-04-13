@@ -19,7 +19,6 @@ import org.ydanilenko.budgettracker.view.ExpenseTransactionView;
 import org.ydanilenko.budgettracker.view.TransactionForm;
 import org.ydanilenko.budgettracker.view.PaymentTypeManager;
 
-import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -28,6 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class IncomeTransactionController {
+
     private final TransactionDAO transactionDAO;
     private final IncomeTransactionView incomeView;
     private List<Transaction> allTransactions;
@@ -47,6 +47,7 @@ public class IncomeTransactionController {
         });
 
         incomeView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange());
+
         incomeView.getResetFilterButton().setOnAction(e -> {
             incomeView.getStartDatePicker().setValue(null);
             incomeView.getEndDatePicker().setValue(null);
@@ -60,22 +61,20 @@ public class IncomeTransactionController {
         });
 
         incomeView.getShowCategoryChartButton().setOnAction(e ->
-                showPieChart("Income by Category", groupByCategory(visibleTransactions))
-        );
+                showPieChart("Income by Category", groupByCategory(visibleTransactions)));
 
         incomeView.getShowPaymentChartButton().setOnAction(e ->
-                showPieChart("Income by Payment Type", groupByPaymentType(visibleTransactions))
-        );
+                showPieChart("Income by Payment Type", groupByPaymentType(visibleTransactions)));
 
         incomeView.getManagePaymentTypesButton().setOnAction(e -> {
-            new PaymentTypeManager(
-                    incomeView.getStage(),
-                    transactionDAO,
-                    null,
-                    incomeView
-            ).show();
+            new PaymentTypeManager(incomeView.getStage(), transactionDAO, null, incomeView).show();
         });
+
         setupContextMenu();
+    }
+
+    public void initialize() {
+        updateTransactionList();
     }
 
     public void addTransaction() {
@@ -102,7 +101,7 @@ public class IncomeTransactionController {
                     comment,
                     placeId,
                     beneficiaryId,
-                    1 // typeId for income
+                    1
             );
 
             boolean success = transactionDAO.addTransaction(transaction);
@@ -114,24 +113,26 @@ public class IncomeTransactionController {
             } else {
                 incomeView.showError("Failed to add income.");
             }
+
         } catch (NumberFormatException e) {
             incomeView.showError("Amount must be a valid number.");
         }
     }
 
-
     public void updateTransactionList() {
         allTransactions = transactionDAO.getTransactionsByType(1);
         LocalDate now = LocalDate.now();
+
         visibleTransactions = allTransactions.stream()
                 .filter(t -> {
                     LocalDate date = LocalDate.parse(t.getDate());
                     return date.getMonth() == now.getMonth() && date.getYear() == now.getYear();
                 })
                 .collect(Collectors.toList());
+
         incomeView.displayTransactions(visibleTransactions);
     }
-    
+
     public void filterTransactionsByDateRange() {
         if (allTransactions == null || allTransactions.isEmpty()) {
             incomeView.showError("No transactions to filter.");
@@ -177,12 +178,12 @@ public class IncomeTransactionController {
         editItem.setOnAction(e -> {
             Transaction selected = incomeView.getSelectedTransaction();
             if (selected != null) {
-                TransactionForm editForm = new TransactionForm(
+                new TransactionForm(
                         incomeView.getStage(),
                         transactionDAO,
                         this::updateTransactionList,
                         selected
-                );
+                ).show(incomeView.getStage(), this::updateTransactionList);
             }
         });
 
@@ -196,14 +197,13 @@ public class IncomeTransactionController {
                         1,
                         selected,
                         this::updateTransactionList
-                );
+                ).show(incomeView.getStage(), this::updateTransactionList);
             }
         });
 
         ContextMenu contextMenu = new ContextMenu(editItem, copyItem);
         table.setContextMenu(contextMenu);
     }
-
 
     private void showPieChart(String title, Map<String, Double> dataMap) {
         Stage popup = new Stage();
@@ -245,9 +245,5 @@ public class IncomeTransactionController {
                 Transaction::getPaymentType,
                 Collectors.summingDouble(Transaction::getAmount)
         ));
-    }
-
-    public void initialize() {
-        updateTransactionList();
     }
 }

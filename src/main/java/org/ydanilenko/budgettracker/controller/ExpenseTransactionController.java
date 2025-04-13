@@ -6,19 +6,13 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
-import org.ydanilenko.budgettracker.view.IncomeTransactionView;
-import org.ydanilenko.budgettracker.view.PaymentTypeManager;
-import org.ydanilenko.budgettracker.view.TransactionForm;
-import org.ydanilenko.budgettracker.view.ExpenseTransactionView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ContextMenu;
-
+import org.ydanilenko.budgettracker.view.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -28,16 +22,29 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ExpenseTransactionController {
+
     private final TransactionDAO transactionDAO;
     private final ExpenseTransactionView expenseTransactionView;
     private List<Transaction> allTransactions;
     private List<Transaction> visibleTransactions;
-    private Transaction copiedTransaction = null;
 
     public ExpenseTransactionController(TransactionDAO transactionDAO, ExpenseTransactionView expenseTransactionView) {
         this.transactionDAO = transactionDAO;
         this.expenseTransactionView = expenseTransactionView;
+        initializeListeners();
+    }
 
+    public void initialize() {
+        updateTransactionList();
+    }
+
+    private void initializeListeners() {
+        configureButtons();
+        setupCharts();
+        setupContextMenu();
+    }
+
+    private void configureButtons() {
         expenseTransactionView.getAddButton().setOnAction(e -> {
             TransactionForm form = new TransactionForm(transactionDAO, 0);
             form.show(expenseTransactionView.getStage(), this::updateTransactionList);
@@ -57,37 +64,32 @@ public class ExpenseTransactionController {
             incomeView.show();
         });
 
-        expenseTransactionView.getShowCategoryChartButton().setOnAction(e ->
-                showPieChart("Spending by Category", groupByCategory(visibleTransactions))
-        );
-
-        expenseTransactionView.getShowPaymentChartButton().setOnAction(e ->
-                showPieChart("Spending by Payment Type", groupByPaymentType(visibleTransactions))
-        );
-
         expenseTransactionView.getManagePaymentTypesButton().setOnAction(e -> {
-            new PaymentTypeManager(
-                    expenseTransactionView.getStage(),
-                    transactionDAO,
-                    expenseTransactionView,
-                    null
-            ).show();
+            new PaymentTypeManager(expenseTransactionView.getStage(), transactionDAO, expenseTransactionView, null).show();
         });
 
         expenseTransactionView.getFilterButton().setOnAction(e -> filterTransactionsByDateRange());
+    }
 
-        setupContextMenu();
+    private void setupCharts() {
+        expenseTransactionView.getShowCategoryChartButton().setOnAction(e ->
+                showPieChart("Spending by Category", groupByCategory(visibleTransactions)));
+
+        expenseTransactionView.getShowPaymentChartButton().setOnAction(e ->
+                showPieChart("Spending by Payment Type", groupByPaymentType(visibleTransactions)));
     }
 
     public void updateTransactionList() {
         allTransactions = transactionDAO.getTransactionsByType(0);
         LocalDate now = LocalDate.now();
+
         visibleTransactions = allTransactions.stream()
                 .filter(t -> {
                     LocalDate date = LocalDate.parse(t.getDate());
                     return date.getMonth() == now.getMonth() && date.getYear() == now.getYear();
                 })
                 .collect(Collectors.toList());
+
         expenseTransactionView.displayTransactions(visibleTransactions);
     }
 
@@ -154,7 +156,7 @@ public class ExpenseTransactionController {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d");
 
-        List<Transaction> filteredTransactions = allTransactions.stream()
+        visibleTransactions = allTransactions.stream()
                 .filter(t -> {
                     try {
                         LocalDate transactionDate = LocalDate.parse(t.getDate(), formatter);
@@ -166,7 +168,7 @@ public class ExpenseTransactionController {
                     }
                 })
                 .collect(Collectors.toList());
-        visibleTransactions = filteredTransactions;
+
         expenseTransactionView.displayTransactions(visibleTransactions);
     }
 
@@ -177,7 +179,7 @@ public class ExpenseTransactionController {
         editItem.setOnAction(e -> {
             Transaction selected = expenseTransactionView.getSelectedTransaction();
             if (selected != null) {
-                TransactionForm editForm = new TransactionForm(
+                new TransactionForm(
                         expenseTransactionView.getStage(),
                         transactionDAO,
                         this::updateTransactionList,
@@ -190,23 +192,17 @@ public class ExpenseTransactionController {
         copyItem.setOnAction(e -> {
             Transaction selected = expenseTransactionView.getSelectedTransaction();
             if (selected != null) {
-                TransactionForm copiedForm = new TransactionForm(
+                new TransactionForm(
                         expenseTransactionView.getStage(),
                         transactionDAO,
                         selected.getTypeId(),
                         selected,
                         this::updateTransactionList
                 );
-                copiedForm.show(expenseTransactionView.getStage(), this::updateTransactionList);
-
             }
         });
 
         ContextMenu contextMenu = new ContextMenu(editItem, copyItem);
         table.setContextMenu(contextMenu);
-    }
-
-    public void initialize() {
-        updateTransactionList();
     }
 }

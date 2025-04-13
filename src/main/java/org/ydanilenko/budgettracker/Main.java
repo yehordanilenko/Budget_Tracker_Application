@@ -16,7 +16,6 @@ public class Main extends Application {
         TransactionDAO transactionDAO = new TransactionDAO(connection);
         ExpenseTransactionView transactionView = new ExpenseTransactionView(primaryStage);
         ExpenseTransactionController transactionController = new ExpenseTransactionController(transactionDAO, transactionView);
-
         Image icon = new Image(getClass().getResourceAsStream("/images/app_icon.png"));
         primaryStage.getIcons().add(icon);
 
