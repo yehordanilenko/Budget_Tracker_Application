@@ -167,7 +167,6 @@ public class IncomeTransactionView {
         layout.setTop(header);
         showHistogramButton.setOnAction(e -> showIncomeExpenseHistogram());
 
-//        HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton);
         HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton, showHistogramButton);
 
         HBox filterRow = new HBox(10, filterButton, resetFilterButton);
@@ -290,8 +289,7 @@ public class IncomeTransactionView {
             String month = LocalDate.parse(t.getDate()).format(monthFormatter);
             expenseMap.merge(month, t.getAmount(), Double::sum);
         }
-
-
+        
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);

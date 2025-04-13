@@ -1,4 +1,3 @@
-
 package org.ydanilenko.budgettracker.view;
 
 import javafx.collections.FXCollections;
@@ -6,7 +5,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -443,7 +441,6 @@ public class TransactionForm {
 
         return form;
     }
-
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

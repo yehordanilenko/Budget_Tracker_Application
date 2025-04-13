@@ -71,7 +71,6 @@ public class TransactionDAO {
         }
     }
 
-
     public List<Transaction> getAllTransactions() {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT t.id, t.amount, t.date, c.name AS categoryName,\n" +
@@ -136,7 +135,7 @@ public class TransactionDAO {
                 Transaction transaction = new Transaction(
                         id, amount, date, categoryName, paymentType, comment, placeName, beneficiaryName
                 );
-                transaction.setTypeId(typeId); // if needed
+                transaction.setTypeId(typeId);
                 transactions.add(transaction);
             }
         } catch (SQLException e) {
@@ -145,7 +144,6 @@ public class TransactionDAO {
 
         return transactions;
     }
-
 
     public List<String> getAllPaymentTypes() {
         List<String> types = new ArrayList<>();
@@ -374,50 +372,5 @@ public class TransactionDAO {
         }
         return null;
     }
-
-    public Map<String, String> getKeywordCategoryMapping() {
-        Map<String, Map<String, Integer>> keywordCounts = new HashMap<>();
-
-        String sql = """
-        SELECT c.name AS category, t.comment
-        FROM Transactions t
-        JOIN Categories c ON t.category_id = c.id
-        WHERE t.comment IS NOT NULL
-    """;
-
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                String category = rs.getString("category");
-                String comment = rs.getString("comment");
-                String[] words = comment.toLowerCase().split("\\W+");
-
-                for (String word : words) {
-                    if (word.isBlank()) continue;
-                    keywordCounts
-                            .computeIfAbsent(word, k -> new HashMap<>())
-                            .merge(category, 1, Integer::sum);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        Map<String, String> result = new HashMap<>();
-        for (Map.Entry<String, Map<String, Integer>> entry : keywordCounts.entrySet()) {
-            String keyword = entry.getKey();
-            Map<String, Integer> counts = entry.getValue();
-            String topCategory = counts.entrySet().stream()
-                    .max(Map.Entry.comparingByValue())
-                    .map(Map.Entry::getKey)
-                    .orElse(null);
-            if (topCategory != null) {
-                result.put(keyword, topCategory);
-            }
-        }
-
-        return result;
-    }
-
 
 }
