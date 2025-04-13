@@ -349,4 +349,29 @@ public class TransactionDAO {
         }
     }
 
+    public String getTopBeneficiaryByCategory(String categoryName) {
+        String sql = """
+        SELECT b.name, COUNT(*) AS freq
+        FROM Transactions t
+        JOIN Categories c ON t.category_id = c.id
+        JOIN Beneficiaries b ON t.beneficiary_id = b.id
+        WHERE c.name = ?
+        GROUP BY b.name
+        ORDER BY freq DESC
+        LIMIT 1
+    """;
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, categoryName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 }

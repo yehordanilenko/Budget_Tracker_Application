@@ -344,7 +344,6 @@ public class IncomeTransactionView {
         return beneficiaryField;
     }
 
-
     public Stage getStage() {
         return stage;
     }

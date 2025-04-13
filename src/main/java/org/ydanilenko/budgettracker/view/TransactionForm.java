@@ -13,6 +13,8 @@ import javafx.util.StringConverter;
 import org.ydanilenko.budgettracker.model.PaymentType;
 import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
+import org.ydanilenko.budgettracker.util.BeneficiarySuggester;
+import org.ydanilenko.budgettracker.util.CategorySuggester;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -64,6 +66,16 @@ public class TransactionForm {
         List<String> places = transactionDAO.getAllPlaces();
         placeField.setEditable(true);
         beneficiaryField.setEditable(true);
+        categoryField.valueProperty().addListener((obs, oldVal, newVal) -> {
+            String suggested = BeneficiarySuggester.suggestBeneficiaryForCategory(newVal, transactionDAO);
+            if (suggested != null) {
+                if (!beneficiaryField.getItems().contains(suggested)) {
+                    beneficiaryField.getItems().add(suggested);
+                }
+                beneficiaryField.setValue(suggested); // selects from dropdown
+                beneficiaryField.getEditor().setText(suggested); // shows in text box
+            }
+        });
 
         placeField.setItems(FXCollections.observableArrayList(places));
         placeField.setValue(editingTransaction.getPlaceName());
@@ -73,6 +85,16 @@ public class TransactionForm {
         placeField.setValue(editingTransaction.getPlaceName());
         beneficiaryField.setValue(editingTransaction.getBeneficiaryName());
         categoryField.setValue(editingTransaction.getCategoryName());
+
+
+
+
+        commentField.textProperty().addListener((obs, oldText, newText) -> {
+            String suggested = CategorySuggester.suggestCategory(newText);
+            if (suggested != null) {
+                categoryField.setValue(suggested);
+            }
+        });
 
         Button saveButton = new Button("Update Transaction");
         saveButton.setOnAction(e -> {
@@ -214,11 +236,26 @@ public class TransactionForm {
         );
 
         TextField commentField = new TextField(copiedTransaction.getComment());
+        commentField.textProperty().addListener((obs, oldText, newText) -> {
+            String suggested = CategorySuggester.suggestCategory(newText);
+            if (suggested != null) {
+                categoryField.setValue(suggested);
+            }
+        });
         ComboBox<String> placeField = new ComboBox<>(FXCollections.observableArrayList(dao.getAllPlaces()));
         ComboBox<String> beneficiaryField = new ComboBox<>(FXCollections.observableArrayList(dao.getAllBeneficiaries()));
         placeField.setEditable(true);
         beneficiaryField.setEditable(true);
-
+        categoryField.valueProperty().addListener((obs, oldVal, newVal) -> {
+            String suggested = BeneficiarySuggester.suggestBeneficiaryForCategory(newVal, transactionDAO);
+            if (suggested != null) {
+                if (!beneficiaryField.getItems().contains(suggested)) {
+                    beneficiaryField.getItems().add(suggested);
+                }
+                beneficiaryField.setValue(suggested); // selects from dropdown
+                beneficiaryField.getEditor().setText(suggested); // shows in text box
+            }
+        });
         placeField.setValue(copiedTransaction.getPlaceName());
         beneficiaryField.setValue(copiedTransaction.getBeneficiaryName());
 
@@ -307,6 +344,7 @@ public class TransactionForm {
         TextField amountField = new TextField();
         DatePicker dateField = new DatePicker(LocalDate.now());
         ComboBox<String> categoryField = new ComboBox<>(FXCollections.observableArrayList(transactionDAO.getAllCategories()));
+
         ComboBox<PaymentType> paymentTypeField = new ComboBox<>(FXCollections.observableArrayList(transactionDAO.getAllPaymentTypeObjects()));
         paymentTypeField.setConverter(new StringConverter<>() {
             @Override
@@ -323,6 +361,16 @@ public class TransactionForm {
         });
 
         TextField commentField = new TextField();
+        commentField.textProperty().addListener((obs, oldText, newText) -> {
+            String suggested = CategorySuggester.suggestCategory(newText);
+            if (suggested != null) {
+                categoryField.setValue(suggested);
+            }
+        });
+
+
+
+
         ComboBox<String> placeField = new ComboBox<>(FXCollections.observableArrayList(transactionDAO.getAllPlaces()));
         ComboBox<String> beneficiaryField = new ComboBox<>(FXCollections.observableArrayList(transactionDAO.getAllBeneficiaries()));
         placeField.setEditable(true);
@@ -330,7 +378,16 @@ public class TransactionForm {
 
         placeField.setPromptText("Select Place");
         beneficiaryField.setPromptText("Select Beneficiary");
-
+        categoryField.valueProperty().addListener((obs, oldVal, newVal) -> {
+            String suggested = BeneficiarySuggester.suggestBeneficiaryForCategory(newVal, transactionDAO);
+            if (suggested != null) {
+                if (!beneficiaryField.getItems().contains(suggested)) {
+                    beneficiaryField.getItems().add(suggested);
+                }
+                beneficiaryField.setValue(suggested); // selects from dropdown
+                beneficiaryField.getEditor().setText(suggested); // shows in text box
+            }
+        });
         Button saveButton = new Button("Add Transaction");
         saveButton.setOnAction(e -> {
             try {
