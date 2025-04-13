@@ -260,8 +260,8 @@ public class IncomeTransactionView {
     private void showIncomeExpenseHistogram() {
         TransactionDAO dao = new TransactionDAO(DatabaseConnection.getConnection());
 
-        List<Transaction> expenses = dao.getTransactionsByType(0); // 0 = Expense
-        List<Transaction> incomes = dao.getTransactionsByType(1);  // 1 = Income
+        List<Transaction> expenses = dao.getTransactionsByType(0);
+        List<Transaction> incomes = dao.getTransactionsByType(1);
 
         LocalDate start = startDatePicker.getValue();
         LocalDate end = endDatePicker.getValue();
@@ -289,7 +289,7 @@ public class IncomeTransactionView {
             String month = LocalDate.parse(t.getDate()).format(monthFormatter);
             expenseMap.merge(month, t.getAmount(), Double::sum);
         }
-        
+
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);

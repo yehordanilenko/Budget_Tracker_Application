@@ -32,7 +32,6 @@ public class IncomeTransactionController {
     private final IncomeTransactionView incomeView;
     private List<Transaction> allTransactions;
     private List<Transaction> visibleTransactions;
-    private Transaction copiedTransaction = null;
 
     public IncomeTransactionController(TransactionDAO transactionDAO, IncomeTransactionView incomeView) {
         this.transactionDAO = transactionDAO;

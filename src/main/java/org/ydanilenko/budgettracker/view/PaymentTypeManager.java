@@ -175,8 +175,8 @@ public class PaymentTypeManager {
         form.add(expRow, 1, 4);
 
         Scene scene = new Scene(form);scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
-        formStage.setWidth(400);  // Wider
-        formStage.setHeight(330); // Taller
+        formStage.setWidth(400);
+        formStage.setHeight(330);
         formStage.setScene(scene);
         formStage.showAndWait();
     }

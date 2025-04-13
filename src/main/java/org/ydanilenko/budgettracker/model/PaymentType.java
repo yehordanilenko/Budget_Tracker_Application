@@ -28,21 +28,18 @@ public class PaymentType {
         this.id = id;
     }
 
-    // Properties
     public StringProperty nameProperty() { return name; }
     public StringProperty bankProperty() { return bank; }
     public StringProperty issuerProperty() { return issuer; }
     public StringProperty issueDateProperty() { return issueDate; }
     public StringProperty expirationDateProperty() { return expirationDate; }
 
-    // Getters
     public String getName() { return name.get(); }
     public String getBank() { return bank.get(); }
     public String getIssuer() { return issuer.get(); }
     public String getIssueDate() { return issueDate.get(); }
     public String getExpirationDate() { return expirationDate.get(); }
 
-    // Setters
     public void setName(String value) { name.set(value); }
     public void setBank(String value) { bank.set(value); }
     public void setIssuer(String value) { issuer.set(value); }

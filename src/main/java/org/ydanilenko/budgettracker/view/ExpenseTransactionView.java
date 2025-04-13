@@ -151,7 +151,7 @@ public class ExpenseTransactionView {
         if (transactions.isEmpty()) {
             table.setPlaceholder(new Label("No expenses to show in this range."));
         } else {
-            table.setPlaceholder(new Label("")); // clears any previous message
+            table.setPlaceholder(new Label(""));
         }
 
         double total = transactions.stream().mapToDouble(Transaction::getAmount).sum();
@@ -275,8 +275,8 @@ public class ExpenseTransactionView {
     private void showIncomeExpenseHistogram() {
         TransactionDAO dao = new TransactionDAO(DatabaseConnection.getConnection());
 
-        List<Transaction> expenses = dao.getTransactionsByType(0); // 0 = Expense
-        List<Transaction> incomes = dao.getTransactionsByType(1);  // 1 = Income
+        List<Transaction> expenses = dao.getTransactionsByType(0);
+        List<Transaction> incomes = dao.getTransactionsByType(1);
 
         LocalDate start = startDatePicker.getValue();
         LocalDate end = endDatePicker.getValue();
