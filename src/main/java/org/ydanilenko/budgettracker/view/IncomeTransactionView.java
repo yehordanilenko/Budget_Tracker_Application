@@ -45,6 +45,7 @@ public class IncomeTransactionView {
     private final ComboBox<String> beneficiaryField = new ComboBox<>();
     private final Label totalLabel = new Label("Total: 0.00");
     private final Button showHistogramButton = new Button("Income vs Expense Chart");
+    private Button statsButton = new Button("Show Statistics");
 
     public IncomeTransactionView(Stage stage) {
         this.stage = stage;
@@ -179,12 +180,17 @@ public class IncomeTransactionView {
             new PaymentTypeManager(stage, new TransactionDAO(DatabaseConnection.getConnection()), null, this).show();
         });
 
+        statsButton.setOnAction(e -> {
+            StatisticsView view = new StatisticsView(new TransactionDAO(DatabaseConnection.getConnection()));
+            view.show();
+        });
+
         Region spacer_for_total = new Region();
         HBox.setHgrow(spacer_for_total, Priority.ALWAYS);
 
         HBox bottomControls = new HBox(10, addButton, managePaymentTypesButton, spacer_for_total, totalLabel);
         bottomControls.setPadding(new Insets(10));
-        HBox leftControls = new HBox(10, addButton, managePaymentTypesButton);
+        HBox leftControls = new HBox(10, addButton, managePaymentTypesButton, statsButton);
         HBox rightTotal = new HBox(totalLabel);
         rightTotal.setAlignment(Pos.CENTER_RIGHT);
         HBox.setHgrow(rightTotal, Priority.ALWAYS);

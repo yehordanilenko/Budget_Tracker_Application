@@ -373,4 +373,83 @@ public class TransactionDAO {
         return null;
     }
 
+    public double getTotalIncome() {
+        return getSumByType(1);
+    }
+
+    public double getTotalExpense() {
+        return getSumByType(0);
+    }
+
+    private double getSumByType(int typeId) {
+        String sql = "SELECT SUM(amount) FROM Transactions WHERE type_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, typeId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() ? rs.getDouble(1) : 0.0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0.0;
+        }
+    }
+
+    public int getTotalTransactions() {
+        String sql = "SELECT COUNT(*) FROM Transactions";
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public double getMaxTransactionAmount() {
+        String sql = "SELECT MAX(amount) FROM Transactions";
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            return rs.next() ? rs.getDouble(1) : 0.0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0.0;
+        }
+    }
+
+    public String getMostUsedCategory() {
+        String sql = """
+        SELECT c.name, COUNT(*) as count
+        FROM Transactions t
+        JOIN Categories c ON t.category_id = c.id
+        GROUP BY c.name
+        ORDER BY count DESC
+        LIMIT 1
+        """;
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            return rs.next() ? rs.getString("name") : "N/A";
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "N/A";
+        }
+    }
+
+    public String getTopBeneficiary() {
+        String sql = """
+        SELECT b.name, COUNT(*) as count
+        FROM Transactions t
+        JOIN Beneficiaries b ON t.beneficiary_id = b.id
+        GROUP BY b.name
+        ORDER BY count DESC
+        LIMIT 1
+        """;
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            return rs.next() ? rs.getString("name") : "N/A";
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "N/A";
+        }
+    }
+
+
 }
