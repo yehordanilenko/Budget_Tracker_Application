@@ -32,14 +32,14 @@ public class ExpenseTransactionView {
     private final Button filterButton;
     private final Button addButton;
     private Stage stage;
-    private final Button resetFilterButton = new Button("Reset Filter");
-    private final Button switchToIncomeButton = new Button("→ Income Page");
-    private final Button showCategoryChartButton = new Button("Spending by Category");
-    private final Button showPaymentChartButton = new Button("Spending by Payment Type");
-    private final Button managePaymentTypesButton = new Button("Manage Payment Types");
+    private final Button resetFilterButton = new Button("\uD83D\uDD04 Reset Filter");
+    private final Button switchToIncomeButton = new Button("\uD83D\uDCE5 Income Page");
+    private final Button showCategoryChartButton = new Button("\uD83D\uDDC2 Spending by Category");
+    private final Button showPaymentChartButton = new Button("\uD83D\uDCB3 Spending by Payment Type");
+    private final Button managePaymentTypesButton = new Button("\uD83C\uDFE6 Manage Payment Types");
     private final Label totalLabel = new Label("Total: 0.00");
-    private final Button showHistogramButton = new Button("Income vs Expense Chart");
-    private Button statsButton = new Button("Show Statistics");
+    private final Button showHistogramButton = new Button("\uD83D\uDCCA Income vs Expense Chart");
+    private Button statsButton = new Button("\uD83D\uDCCB Show Statistics");
 
     public ExpenseTransactionView(Stage stage) {
         this.stage = stage;
@@ -48,8 +48,8 @@ public class ExpenseTransactionView {
         this.paymentTypePieChart = new PieChart();
         this.startDatePicker = new DatePicker();
         this.endDatePicker = new DatePicker();
-        this.filterButton = new Button("Filter");
-        this.addButton = new Button("Add Expense");
+        this.filterButton = new Button("\uD83D\uDD0D Filter");
+        this.addButton = new Button("➕ Add Expense");
 
         setupTable();
         setupPieChart();

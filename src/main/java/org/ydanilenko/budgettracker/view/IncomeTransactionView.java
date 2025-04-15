@@ -32,20 +32,20 @@ public class IncomeTransactionView {
     private final TextField commentField = new TextField();
     private final DatePicker startDatePicker = new DatePicker();
     private final DatePicker endDatePicker = new DatePicker();
-    private final Button filterButton = new Button("Filter");
-    private final Button resetFilterButton = new Button("Reset Filter");
-    private final Button addButton = new Button("Add Income");
-    private final Button switchToExpenseButton = new Button("← Expense Page");
+    private final Button filterButton = new Button("\uD83D\uDD0D Filter");
+    private final Button resetFilterButton = new Button("\uD83D\uDD04 Reset Filter");
+    private final Button addButton = new Button("➕ Add Income");
+    private final Button switchToExpenseButton = new Button("\uD83D\uDCE4 Expense Page");
     private final Stage stage;
     private ExpenseTransactionView expenseView;
-    Button showCategoryChartButton = new Button("Income by Category");
-    Button showPaymentChartButton = new Button("Income by Payment Type");
-    private final Button managePaymentTypesButton = new Button("Manage Payment Types");
+    Button showCategoryChartButton = new Button("\uD83D\uDDC2 Income by Category");
+    Button showPaymentChartButton = new Button("\uD83D\uDCB3 Income by Payment Type");
+    private final Button managePaymentTypesButton = new Button("\uD83C\uDFE6 Manage Payment Types");
     private final ComboBox<String> placeField = new ComboBox<>();
     private final ComboBox<String> beneficiaryField = new ComboBox<>();
     private final Label totalLabel = new Label("Total: 0.00");
-    private final Button showHistogramButton = new Button("Income vs Expense Chart");
-    private Button statsButton = new Button("Show Statistics");
+    private final Button showHistogramButton = new Button("\uD83D\uDCCA Income vs Expense Chart");
+    private Button statsButton = new Button("\uD83D\uDCCB Show Statistics");
 
     public IncomeTransactionView(Stage stage) {
         this.stage = stage;
