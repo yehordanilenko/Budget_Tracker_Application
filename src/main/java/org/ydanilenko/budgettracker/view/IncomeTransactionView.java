@@ -75,7 +75,6 @@ public class IncomeTransactionView {
         TableColumn<Transaction, String> beneficiaryColumn = new TableColumn<>("Beneficiary");
         beneficiaryColumn.setCellValueFactory(new PropertyValueFactory<>("beneficiaryName"));
 
-
         table.getColumns().addAll(
                 dateColumn,
                 placeColumn,
@@ -116,9 +115,7 @@ public class IncomeTransactionView {
         } else {
             table.setPlaceholder(new Label(""));
         }
-
     }
-
 
     private void updateCharts(List<Transaction> transactions) {
         double total = transactions.stream().mapToDouble(Transaction::getAmount).sum();
@@ -152,7 +149,6 @@ public class IncomeTransactionView {
     }
 
     public void show() {
-
         BorderPane layout = new BorderPane();
         layout.setPadding(new Insets(10));
 
@@ -171,10 +167,16 @@ public class IncomeTransactionView {
         HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton, showHistogramButton);
 
         HBox filterRow = new HBox(10, filterButton, resetFilterButton);
-        HBox dateRow = new HBox(10,
-                new Label("Start Date:"), startDatePicker,
-                new Label("End Date:"), endDatePicker
-        );
+        Label startLabel = new Label("Start Date:");
+        startLabel.setAlignment(Pos.CENTER_LEFT);
+        startLabel.setMinHeight(Control.USE_PREF_SIZE);
+
+        Label endLabel = new Label("End Date:");
+        endLabel.setAlignment(Pos.CENTER_LEFT);
+        endLabel.setMinHeight(Control.USE_PREF_SIZE);
+
+        HBox dateRow = new HBox(10, startLabel, startDatePicker, endLabel, endDatePicker);
+        dateRow.setAlignment(Pos.CENTER_LEFT);
 
         managePaymentTypesButton.setOnAction(e -> {
             new PaymentTypeManager(stage, new TransactionDAO(DatabaseConnection.getConnection()), null, this).show();
@@ -188,8 +190,6 @@ public class IncomeTransactionView {
         Region spacer_for_total = new Region();
         HBox.setHgrow(spacer_for_total, Priority.ALWAYS);
 
-        HBox bottomControls = new HBox(10, addButton, managePaymentTypesButton, spacer_for_total, totalLabel);
-        bottomControls.setPadding(new Insets(10));
         HBox leftControls = new HBox(10, addButton, managePaymentTypesButton, statsButton);
         HBox rightTotal = new HBox(totalLabel);
         rightTotal.setAlignment(Pos.CENTER_RIGHT);
@@ -198,16 +198,12 @@ public class IncomeTransactionView {
         BorderPane bottomPane = new BorderPane();
         bottomPane.setLeft(leftControls);
         bottomPane.setRight(rightTotal);
-        bottomPane.setPadding(new Insets(10));
 
         layout.setBottom(bottomPane);
 
-
-        VBox pieAndFilterBox = new VBox(20, chartButtonBox, filterRow, dateRow);
+        VBox pieAndFilterBox = new VBox(20, chartButtonBox, dateRow, filterRow);
         VBox mainCenter = new VBox(10, table, pieAndFilterBox);
         layout.setCenter(mainCenter);
-
-
 
         Scene scene = new Scene(layout, 1000, 700);
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
@@ -225,15 +221,25 @@ public class IncomeTransactionView {
     }
 
     public TextField getAmountField() { return amountField; }
+
     public DatePicker getDateField() { return dateField; }
+
     public ComboBox<String> getCategoryField() { return categoryField; }
+
     public ComboBox<String> getPaymentTypeField() { return paymentTypeField; }
+
     public TextField getCommentField() { return commentField; }
+
     public Button getAddButton() { return addButton; }
+
     public Button getFilterButton() { return filterButton; }
+
     public Button getResetFilterButton() { return resetFilterButton; }
+
     public Button getSwitchToExpenseButton() { return switchToExpenseButton; }
+
     public DatePicker getStartDatePicker() { return startDatePicker; }
+
     public DatePicker getEndDatePicker() { return endDatePicker; }
 
     public void setExpenseView(ExpenseTransactionView view) {
@@ -326,11 +332,11 @@ public class IncomeTransactionView {
         chartStage.setTitle("Income vs Expense Histogram");
         chartStage.setScene(new Scene(barChart, 800, 600));
         chartStage.showAndWait();
-
     }
     public Button getManagePaymentTypesButton() {
         return managePaymentTypesButton;
     }
+
     public void clearInputFields() {
         amountField.clear();
         dateField.setValue(null);

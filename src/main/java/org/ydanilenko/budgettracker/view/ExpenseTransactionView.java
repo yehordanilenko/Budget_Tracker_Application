@@ -81,7 +81,6 @@ public class ExpenseTransactionView {
         TableColumn<Transaction, String> beneficiaryColumn = new TableColumn<>("Beneficiary");
         beneficiaryColumn.setCellValueFactory(new PropertyValueFactory<>("beneficiaryName"));
 
-
         table.getColumns().addAll(
                 dateColumn,
                 placeColumn,
@@ -168,25 +167,6 @@ public class ExpenseTransactionView {
         """);
     }
 
-
-    public VBox createDateRangeFilter() {
-        VBox dateFilterBox = new VBox(10);
-        dateFilterBox.setPadding(new Insets(10));
-
-        HBox buttonBox = new HBox(10, filterButton, resetFilterButton);
-
-        HBox datePickers = new HBox(10);
-        datePickers.getChildren().addAll(
-                new Label("Start Date:"), startDatePicker,
-                new Label("End Date:"), endDatePicker
-        );
-
-        dateFilterBox.getChildren().addAll(buttonBox, datePickers);
-
-        return dateFilterBox;
-    }
-
-
     public void show(Stage stage) {
         this.stage = stage;
 
@@ -208,12 +188,18 @@ public class ExpenseTransactionView {
 
         HBox filterRow = new HBox(10, filterButton, resetFilterButton);
 
-        HBox dateRow = new HBox(10,
-                new Label("Start Date:"), startDatePicker,
-                new Label("End Date:"), endDatePicker
-        );
+        Label startLabel = new Label("Start Date:");
+        startLabel.setAlignment(Pos.CENTER_LEFT);
+        startLabel.setMinHeight(Control.USE_PREF_SIZE);
 
-        VBox pieAndFilterBox = new VBox(20, chartButtonBox, filterRow, dateRow);
+        Label endLabel = new Label("End Date:");
+        endLabel.setAlignment(Pos.CENTER_LEFT);
+        endLabel.setMinHeight(Control.USE_PREF_SIZE);
+
+        HBox dateRow = new HBox(10, startLabel, startDatePicker, endLabel, endDatePicker);
+        dateRow.setAlignment(Pos.CENTER_LEFT);
+
+        VBox pieAndFilterBox = new VBox(20, chartButtonBox, dateRow, filterRow);
 
         VBox mainCenter = new VBox(10, table, pieAndFilterBox);
         layout.setCenter(mainCenter);
@@ -237,8 +223,6 @@ public class ExpenseTransactionView {
         Region spacer_for_total = new Region();
         HBox.setHgrow(spacer_for_total, Priority.ALWAYS);
 
-        HBox bottomControls = new HBox(10, addButton, managePaymentTypesButton, statsButton, spacer_for_total, totalLabel);
-        bottomControls.setPadding(new Insets(10));
         HBox leftControls = new HBox(10, addButton, managePaymentTypesButton, statsButton);
         HBox rightTotal = new HBox(totalLabel);
         rightTotal.setAlignment(Pos.CENTER_RIGHT);
@@ -247,12 +231,8 @@ public class ExpenseTransactionView {
         BorderPane bottomPane = new BorderPane();
         bottomPane.setLeft(leftControls);
         bottomPane.setRight(rightTotal);
-        bottomPane.setPadding(new Insets(10));
 
         layout.setBottom(bottomPane);
-
-
-
 
         Scene scene = new Scene(layout, 1000, 700);
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
@@ -261,7 +241,6 @@ public class ExpenseTransactionView {
         stage.show();
     }
 
-
     public Button getShowCategoryChartButton() {
         return showCategoryChartButton;
     }
@@ -269,7 +248,6 @@ public class ExpenseTransactionView {
     public Button getShowPaymentChartButton() {
         return showPaymentChartButton;
     }
-
 
     public void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -346,14 +324,6 @@ public class ExpenseTransactionView {
 
     }
 
-    public void showSuccess(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Success");
-        alert.setHeaderText("Action Completed");
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
     public Transaction getSelectedTransaction() {
         return table.getSelectionModel().getSelectedItem();
     }
@@ -365,6 +335,7 @@ public class ExpenseTransactionView {
     public Button getAddButton() {
         return addButton;
     }
+
     public Button getManagePaymentTypesButton() {
         return managePaymentTypesButton;
     }
