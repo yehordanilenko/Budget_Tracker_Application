@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -175,6 +176,7 @@ public class TransactionForm {
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
         popupStage.setScene(scene);
         popupStage.setTitle("Edit Transaction");
+        popupStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/plus_icon.png")));
         popupStage.show();
     }
 
@@ -186,6 +188,7 @@ public class TransactionForm {
         popupStage.initModality(Modality.APPLICATION_MODAL);
         popupStage.initOwner(parentStage);
         popupStage.setTitle("Add Transaction (Copied)");
+        popupStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/plus_icon.png")));
 
         TextField amountField = new TextField(String.valueOf(copiedTransaction.getAmount()));
         DatePicker dateField = new DatePicker(LocalDate.parse(copiedTransaction.getDate()));
@@ -304,7 +307,6 @@ public class TransactionForm {
         popupStage.initModality(Modality.WINDOW_MODAL);
         popupStage.initOwner(parentStage);
         popupStage.setTitle("Add Transaction");
-
         TextField amountField = new TextField();
         DatePicker dateField = new DatePicker(LocalDate.now());
         ComboBox<String> categoryField = new ComboBox<>(FXCollections.observableArrayList(transactionDAO.getAllCategories()));
@@ -406,6 +408,8 @@ public class TransactionForm {
 
         Scene scene = new Scene(form, 400, 350);
         scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+        Image icon = new Image(getClass().getResourceAsStream("/images/plus_icon.png"));
+        popupStage.getIcons().add(icon);
         popupStage.setScene(scene);
         popupStage.showAndWait();
     }

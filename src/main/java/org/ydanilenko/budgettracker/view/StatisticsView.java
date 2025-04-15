@@ -3,6 +3,7 @@ package org.ydanilenko.budgettracker.view;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -19,6 +20,7 @@ public class StatisticsView {
         Stage statsStage = new Stage();
         statsStage.setTitle("Financial Statistics");
         statsStage.initModality(Modality.APPLICATION_MODAL);
+        statsStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/statistics_icon.png")));
 
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(20));
@@ -39,7 +41,7 @@ public class StatisticsView {
         grid.add(topCategoryLabel, 0, 4);
         grid.add(topBeneficiaryLabel, 0, 5);
 
-        Scene scene = new Scene(grid);
+        Scene scene = new Scene(grid, 275, 200);
         statsStage.setScene(scene);
         statsStage.showAndWait();
     }

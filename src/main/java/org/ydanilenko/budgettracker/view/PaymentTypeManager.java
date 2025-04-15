@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -27,7 +28,8 @@ public class PaymentTypeManager {
         this.window.initOwner(ownerStage);
         this.window.initModality(Modality.APPLICATION_MODAL);
         this.window.setTitle("Manage Payment Types");
-
+        Image icon = new Image(getClass().getResourceAsStream("/images/bank_icon.png"));
+        this.window.getIcons().add(icon);
         this.table = new TableView<>();
         setupTable();
 
@@ -93,7 +95,7 @@ public class PaymentTypeManager {
         formStage.initOwner(window);
         formStage.initModality(Modality.APPLICATION_MODAL);
         formStage.setTitle(pt == null ? "Add Payment Type" : "Edit Payment Type");
-
+        formStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/bank_icon.png")));
         TextField nameField = new TextField(pt != null ? pt.getName() : "");
         TextField bankField = new TextField(pt != null ? pt.getBank() : "");
         TextField issuerField = new TextField(pt != null ? pt.getIssuer() : "");

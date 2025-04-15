@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.beans.binding.Bindings;
 
@@ -183,8 +184,39 @@ public class ExpenseTransactionView {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         header.getChildren().addAll(title, spacer, switchToIncomeButton);
         layout.setTop(header);
+        showCategoryChartButton.setOnAction(e -> {
+            Stage chartStage = new Stage();
+            chartStage.initModality(Modality.APPLICATION_MODAL);
+            chartStage.initOwner(stage);
+            chartStage.setTitle("Spending by Category");
+
+            VBox chartRoot = new VBox(pieChart);
+            chartRoot.setPadding(new Insets(20));
+
+            Image icon = new Image(getClass().getResourceAsStream("/images/circle_diagram_icon.png"));
+            chartStage.getIcons().add(icon);
+
+            chartStage.setScene(new Scene(chartRoot, 600, 450));
+            chartStage.showAndWait();
+        });
 
         HBox chartButtonBox = new HBox(10, showCategoryChartButton, showPaymentChartButton, showHistogramButton);
+
+        showPaymentChartButton.setOnAction(e -> {
+            Stage chartStage = new Stage();
+            chartStage.initModality(Modality.APPLICATION_MODAL);
+            chartStage.initOwner(stage);
+            chartStage.setTitle("Spending by Payment Type");
+
+            Image icon = new Image(getClass().getResourceAsStream("/images/credit_card_icon.png"));
+            chartStage.getIcons().add(icon);
+
+            Scene scene = new Scene(new VBox(paymentTypePieChart), 600, 450);
+            scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+
+            chartStage.setScene(scene);
+            chartStage.showAndWait();
+        });
 
         HBox filterRow = new HBox(10, filterButton, resetFilterButton);
 
@@ -319,7 +351,9 @@ public class ExpenseTransactionView {
         chartStage.initModality(Modality.APPLICATION_MODAL);
         chartStage.initOwner(stage);
         chartStage.setTitle("Income vs Expense Histogram");
-        chartStage.setScene(new Scene(barChart, 800, 600));
+        Image icon = new Image(getClass().getResourceAsStream("/images/histogram_diagram_icon.png"));
+        chartStage.getIcons().add(icon);
+        chartStage.setScene(new Scene(barChart, 600, 450));
         chartStage.showAndWait();
 
     }
