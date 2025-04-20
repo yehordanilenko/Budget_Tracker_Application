@@ -16,7 +16,6 @@ import javafx.stage.Stage;
 import org.ydanilenko.budgettracker.model.Transaction;
 import org.ydanilenko.budgettracker.model.TransactionDAO;
 import org.ydanilenko.budgettracker.util.DatabaseConnection;
-import org.ydanilenko.budgettracker.view.PaymentTypeManager;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
