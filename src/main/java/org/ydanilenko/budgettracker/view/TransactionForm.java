@@ -89,6 +89,10 @@ public class TransactionForm {
         saveButton.setOnAction(e -> {
             try {
                 double amount = Double.parseDouble(amountField.getText());
+                if (amount < 0) {
+                    showError("Amount cannot be negative.");
+                    return;
+                }
                 String date = dateField.getValue().toString();
                 String categoryName = categoryField.getValue();
                 if (categoryName == null) {
@@ -237,6 +241,10 @@ public class TransactionForm {
         saveButton.setOnAction(e -> {
             try {
                 double amount = Double.parseDouble(amountField.getText());
+                if (amount < 0) {
+                    showError("Amount cannot be negative.");
+                    return;
+                }
                 String date = dateField.getValue().toString();
                 String categoryName = categoryField.getValue();
                 if (categoryName == null) {
@@ -349,6 +357,11 @@ public class TransactionForm {
         saveButton.setOnAction(e -> {
             try {
                 double amount = Double.parseDouble(amountField.getText());
+                if (amount < 0) {
+                    showError("Amount cannot be negative.");
+                    return;
+                }
+
                 String date = dateField.getValue().toString();
                 String categoryName = categoryField.getValue();
                 if (categoryName == null) {
