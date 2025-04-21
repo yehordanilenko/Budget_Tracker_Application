@@ -459,6 +459,29 @@ public class TransactionForm {
         return form;
     }
 
+    public static boolean isValidAmount(String input) {
+        try {
+            double amount = Double.parseDouble(input);
+            return amount >= 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isValidCategory(String category) {
+        return category != null && !category.isBlank();
+    }
+
+    public static boolean isValidPaymentType(Object paymentType) {
+        return paymentType != null;
+    }
+
+    public static boolean isValidPlaceAndBeneficiary(String place, String beneficiary) {
+        return place != null && !place.trim().isEmpty()
+                && beneficiary != null && !beneficiary.trim().isEmpty();
+    }
+
+
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
